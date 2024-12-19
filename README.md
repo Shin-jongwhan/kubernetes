@@ -14,7 +14,8 @@
 ### 쿠버네티스는 매우 유명하고 유용한 툴이다 !
 ### 아주 다양한 기능들이 있다.
 - autoscaling
-- server cluster 관리 (multi node kubernetes
-- 
+- server cluster 관리 (multi node kubernetes cluster)
+- Ingress (proxy server, 로드 밸런싱)
+- HPA (horizontal pod autoscaler)
 ### <br/><br/>
 
