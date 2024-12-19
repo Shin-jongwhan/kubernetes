@@ -31,29 +31,38 @@
 
 ## 쿠버네티스의 구성 요소
 ### 1. 클러스터 구성 요소
-- Control Plane (제어 평면):
-  - API Server: 모든 명령어와 조작을 받는 쿠버네티스의 엔트리 포인트.
-  - Scheduler: 워커 노드에 작업을 할당.
-  - Controller Manager: 클러스터 상태를 관리.
-  - etcd: 클러스터의 상태를 저장하는 키-값 데이터 저장소.
-- 노드 컴포넌트:
-  - kubelet: 워커 노드에서 Pod를 관리.
-  - kube-proxy: 네트워크 라우팅.
-  - 컨테이너 런타임: Docker, containerd 등.
+- Control Plane (제어 평면)
+  - API Server : 모든 명령어와 조작을 받는 쿠버네티스의 엔트리 포인트.
+  - Scheduler : 워커 노드에 작업을 할당.
+  - Controller Manager : 클러스터 상태를 관리.
+  - etcd : 클러스터의 상태를 저장하는 키-값 데이터 저장소.
+- 노드 컴포넌트 :
+  - kubelet : 워커 노드에서 Pod를 관리.
+  - kube-proxy : 네트워크 라우팅.
+  - 컨테이너 런타임 : Docker, containerd 등.
 ### <br/>
 
 ### 2. 쿠버네티스 객체
-- Pod: 컨테이너가 포함된 가장 작은 배포 단위. pod는 ip와 port를 할당받는다. CNI(Container Network Interface) 플러그인을 통해 할당 받는다.
-- Service: Pod에 대한 네트워크 접근을 추상화. service는 쿠버네티스가 관리하는 endpoint가 있어서, 쿠버네티스에서 통신을 할 때에는 endpoint로 pod와 연결된다. 
-- Deployment: 애플리케이션의 배포와 관리.
-- ConfigMap & Secrets: 설정 정보와 민감 정보를 관리.
+- Pod : 컨테이너가 포함된 가장 작은 배포 단위. pod는 ip와 port를 할당받는다. CNI(Container Network Interface) 플러그인을 통해 할당 받는다. 대표적인 플러그인으로 Calico, Flannel, Weave 등이 있다.<br/>
+참고로 컨테이너는 pod 내에서 로컬 ip와 포트로 접속되고 따로 쿠버네티스에서 관리하는 ip와 port는 할당 받지는 않는다.<br/>
+pod는 service가 연결된 pod를 찾기 위해 ip와 포트 기반으로 endpoint 역할을 한다. 여기서 사용되는 포트는 service가 이용하는 포트이다.<br/>
+Pod는 수명 주기가 짧고, 삭제되었다가 다시 생성되면 IP가 변경될 수 있다.
+- Service : Pod에 대한 네트워크 접근을 추상화. service는 쿠버네티스가 관리하는 endpoint가 있어서, 쿠버네티스에서 통신을 할 때에는 endpoint로 pod와 연결된다. <br/>
+Service는 Pod의 IP 변경과 관계없이 항상 안정적인 endpoint를 제공한다. 여기서 이용하는 포트는 client가 이용하는 포트이다.
+- Deployment : 애플리케이션의 배포와 관리.
+- ConfigMap & Secrets : 설정 정보와 민감 정보를 관리.
 ### <br/>
 
 ### 3. 클러스터 관리
-- 노드: 애플리케이션을 실행하는 물리적/가상 서버.
-- 마스터 노드: 클러스터 제어.
-- 워커 노드: 컨테이너 실행.
-- 스케줄러: 컨테이너가 실행될 노드를 자동으로 선택.
+- 노드 : 애플리케이션을 실행하는 물리적/가상 서버.
+- 마스터 노드 : 클러스터 제어. <br/>
+마스터 노드는 다음의 기능을 주요로 실행해야 한다. 마스터 노드에서도 물론 pod를 운영할 수는 있지만 이는 워커 노드에서 해야 한다.
+  - API Server : 클러스터와 상호작용하는 엔트리 포인트.
+  - Scheduler : Pod를 워커 노드에 스케줄링.
+  - Controller Manager : 클러스터 상태를 모니터링하고 필요한 작업 수행.
+  - etcd : 클러스터 상태를 저장하는 키-값 데이터 저장소.
+- 워커 노드 : 컨테이너 실행.
+- 스케줄러 : 컨테이너가 실행될 노드를 자동으로 선택.
 ### <br/><br/>
 
 ### container, pod, service의 포함 관계
