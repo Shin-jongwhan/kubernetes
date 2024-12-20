@@ -25,7 +25,20 @@
 - 클라우드 연동
 - rolling update : 컨테이너에 포함된 앱이 업데이트되면 점진적으로 최신 버전으로 이관되게 하는 기능
 - 스토리지 오케스트레이션 : 로컬 스토리지, 클라우드 스토리지, 네트워크 스토리지 등 다양한 스토리지 솔루션과 연동
+  - Persistent Volume (PV) : 클러스터 외부에서 데이터 저장을 위한 스토리지
+  - Persistent Volume Claim (PVC) : Pod에서 스토리지를 요청하는 방식
 - 배포와 롤백 : 문제가 발생할 경우 이전 버전으로 롤백
+- secrt : 민감한 정보를 암호화하여 저장
+  ```
+    apiVersion: v1
+  kind: Secret
+  metadata:
+    name: example-secret
+  type: Opaque
+  data:
+    username: dXNlcm5hbWU=  # Base64 인코딩
+    password: cGFzc3dvcmQ=
+  ```
 ### <br/><br/><br/>
 
 
