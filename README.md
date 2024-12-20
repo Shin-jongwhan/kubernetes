@@ -16,19 +16,29 @@
 ## 컨테이너 관리, orchastration tool
 ### 쿠버네티스는 매우 유명하고 유용한 툴이다 !
 ### 아주 다양한 기능들이 있다.
-- autoscaling
 - load balancing
-- health check 및 복구
 - server cluster 관리 (multi node kubernetes cluster)
 - Ingress : proxy server, 로드 밸런싱. HPA와 같이 사용하면 트래픽 처리에 대해 오토스케일링이 된다.
-- HPA (horizontal pod autoscaler) : 오토스케일링
+- HPA (horizontal pod autoscaler) : autoscaling 관리
 - 클라우드 연동
 - rolling update : 컨테이너에 포함된 앱이 업데이트되면 점진적으로 최신 버전으로 이관되게 하는 기능
 - 스토리지 오케스트레이션 : 로컬 스토리지, 클라우드 스토리지, 네트워크 스토리지 등 다양한 스토리지 솔루션과 연동
   - Persistent Volume (PV) : 클러스터 외부에서 데이터 저장을 위한 스토리지
   - Persistent Volume Claim (PVC) : Pod에서 스토리지를 요청하는 방식
-- 배포와 롤백 : 문제가 발생할 경우 이전 버전으로 롤백
-- secrt : 민감한 정보를 암호화하여 저장
+- deployment : 배포 관리
+  - rollback : 버전에 문제가 있는 경우 롤백 지원
+  - ReplicaSet : replica를 stand by하고 복구에 지원
+  - rolling update : 업데이트를 안전하게 수행하기 위한 전략. 업데이트 버전으로 점진적으로 이동한다.
+  - update : 새로운 버전으로 pod의 컨테이너를 업데이트
+- statefulSet : StatefulSet은 상태를 유지해야 하는 애플리케이션을 위한 리소스. 데이터베이스, 캐시 서버와 같은 애플리케이션에서 사용된다. 예를 들어 MySQL, Redis, MongoDB 등...
+  - PV와 연동해서 사용한다.
+  - statefulSet의 pod는 각각 고유의 DNS 주소를 가진다.
+- DaemonSet : 클러스터의 모든 노드에서 Pod를 실행하기 위한 리소스. 노드에 필요한 시스템 작업, 로그 수집, 모니터링 에이전트를 배포하는 데 사용된다.
+  - 노드당 하나의 Pod : 각 노드에 하나의 Pod만 실행. 노드가 추가되면 자동으로 새로운 Pod가 생성됨.
+  - 자동 배포 및 삭제 : 새로운 노드가 클러스터에 추가되면 해당 노드에서 DaemonSet의 Pod가 자동으로 실행. 노드가 삭제되면 해당 Pod도 자동으로 제거됨.
+  - 특정 노드에서만 실행 가능 : nodeSelector, taints 및 tolerations를 사용하여 특정 노드에서만 실행되도록 설정 가능.
+  - 사용자 정의 네트워크 설정 : 각 Pod는 노드에 직접 연결되므로 로깅 및 네트워크 트래픽 수집에 유리함.
+- secret : 민감한 정보를 암호화하여 저장. API 키, 비밀번호, 인증서 등 저장하는 데에 사용한다.
   ```
     apiVersion: v1
   kind: Secret
@@ -39,6 +49,17 @@
     username: dXNlcm5hbWU=  # Base64 인코딩
     password: cGFzc3dvcmQ=
   ```
+- ConfigMap : 애플리케이션의 구성 데이터를 관리
+  ```
+    apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: example-config
+  data:
+    key1: value1
+    key2: value2
+  ```
+- cronjob : 리눅스 cron이랑은 다름. 쿠버네티스에 특화된 작업 스케쥴러다. 모니터링, 로깅 등에 사용한다.
 ### <br/><br/><br/>
 
 
@@ -59,7 +80,7 @@
 - Pod : 컨테이너가 포함된 가장 작은 배포 단위. pod는 ip와 port를 할당받는다. CNI(Container Network Interface) 플러그인을 통해 할당 받는다. 대표적인 플러그인으로 Calico, Flannel, Weave 등이 있다.<br/>
 참고로 컨테이너는 pod 내에서 로컬 ip와 포트로 접속되고 따로 쿠버네티스에서 관리하는 ip와 port는 할당 받지는 않는다.<br/>
 pod는 service가 연결된 pod를 찾기 위해 ip와 포트 기반으로 endpoint 역할을 한다. 여기서 사용되는 포트는 service가 이용하는 포트이다.<br/>
-Pod는 수명 주기가 짧고, 삭제되었다가 다시 생성되면 IP가 변경될 수 있다.
+Pod는 수명 주기가 짧고, 삭제되었다가 다시 생성되면 IP가 변경될 수 있다.<br/>
 - Service : Pod에 대한 네트워크 접근을 추상화. service는 쿠버네티스가 관리하는 endpoint가 있어서, 쿠버네티스에서 통신을 할 때에는 endpoint로 pod와 연결된다. <br/>
 Service는 Pod의 IP 변경과 관계없이 항상 안정적인 endpoint를 제공한다. 여기서 이용하는 포트는 client가 이용하는 포트이다.
 - Deployment : 애플리케이션의 배포와 관리.
