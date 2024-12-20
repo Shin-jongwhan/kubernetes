@@ -71,11 +71,14 @@ sudo sysctl --system
 
 ### cgroup 확인
 ### 자세한 것은 공식 홈페이지 내용을 확인한다.
-#### ![image](https://github.com/user-attachments/assets/1f5c52ee-c5a6-430f-ad88-bca93b441929)
 #### [컨테이너 런타임](https://kubernetes.io/ko/docs/setup/production-environment/container-runtimes/)
+#### ![image](https://github.com/user-attachments/assets/1f5c52ee-c5a6-430f-ad88-bca93b441929)
+
+### cmd
 ```
 docker info | grep -i cgroup
 ```
+#### ![image](https://github.com/user-attachments/assets/b53ac05b-998e-438c-97a1-e0172cace81a)
 ### <br/>
 
 ### kubectl 버전 확인
