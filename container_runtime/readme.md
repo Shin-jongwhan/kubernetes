@@ -96,7 +96,6 @@
 - Image Management : 컨테이너 이미지를 다운로드 및 실행.
 ### <br/><br/><br/>
 
----
 
 ## OCI (Open Container Initiative)
 ### **OCI(Open Container Initiative)**는 컨테이너 기술의 표준화를 목표로 하는 오픈소스 프로젝트이다. 
@@ -185,3 +184,10 @@
   - OCI 호환 컨테이너 이미지를 빌드하는 도구
 - **Skopeo**:
   - 컨테이너 이미지를 검사하고 관리하는 도구
+### <br/>
+
+---
+
+## OCI 정리
+### OCI는 container 표준 개발 지침서라고 보면 된다. container 관련 프로그램들은 대부분(?) 이것을 따르면 된다고 보면 된다.
+### 그런데 docker Inc에서부터 출발하였으니 당연 근본은 docker이다. container 기술이 발전하고 보편화된 것도 사실 docker 덕분이지...
