@@ -78,6 +78,7 @@ sudo sysctl --system
 ```
 docker info | grep -i cgroup
 ```
+### 다음과 같이 출력되면 설정 상태가 이용해도 괜찮은 상태이다. 
 #### ![image](https://github.com/user-attachments/assets/b53ac05b-998e-438c-97a1-e0172cace81a)
 ### <br/>
 
