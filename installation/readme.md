@@ -98,3 +98,10 @@ kubeadm version
 
 ### <br/>
 
+### service 실행 및 확인
+### service 또는 systemctl 명령어를 이용한다.
+```
+service kubelet start
+service kubelet status
+```
+#### ![image](https://github.com/user-attachments/assets/6b9820cf-870b-40f4-890c-918b72f8bf35)
