@@ -3,6 +3,7 @@
 ## install 방법
 ### 참고
 #### https://kubernetes.io/ko/docs/tasks/tools/install-kubectl-linux/
+#### https://kubernetes.io/ko/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#verify-mac-address
 ### <br/><br/>
 
 
@@ -20,6 +21,10 @@ vi /etc/fstab
 apt update
 apt install -y apt-transport-https ca-certificates curl
 ```
+### <br/>
+
+### 다음을 설치하라고 한다.
+#### ![image](https://github.com/user-attachments/assets/d9c87ba2-96c3-49af-9534-9a127e08a449)
 ### <br/>
 
 ### 그리고 만약 docker가 설치가 안 되어 있다면 설치한다.
