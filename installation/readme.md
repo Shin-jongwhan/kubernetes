@@ -19,7 +19,7 @@ vi /etc/fstab
 ### 필수 패키지 설치
 ```
 apt update
-apt install -y apt-transport-https ca-certificates curl
+apt install -y apt-transport-https ca-certificates curl gnupg
 ```
 ### <br/>
 
@@ -45,9 +45,12 @@ curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | sudo gpg --
 
 # apt repo 추가
 echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+# 설치
 sudo apt-get update
+
+# 쿠버네티스 패키지 버전 고정
 sudo apt-get install -y kubelet kubeadm kubectl
-sudo apt-mark hold kubelet kubeadm kubectl
 ```
 ### <br/>
 
@@ -82,14 +85,17 @@ docker info | grep -i cgroup
 #### ![image](https://github.com/user-attachments/assets/b53ac05b-998e-438c-97a1-e0172cace81a)
 ### <br/>
 
-### kubectl 버전 확인
+### 버전 확인
 ```
 kubectl version --client
-
 # detail
 kubectl version --client --output=yaml
+
+kubelet --version
+
+kubeadm version
 ```
-#### ![image](https://github.com/user-attachments/assets/4f9f090e-e210-4683-9b3a-629ca5d3fa20)
+#### ![image](https://github.com/user-attachments/assets/b4d62cae-6691-4099-aa19-0d617ceb065b)
 
 ### <br/>
 
