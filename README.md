@@ -18,7 +18,7 @@
 ### 아주 다양한 기능들이 있다.
 - autoscaling
 - load balancing
-- health check 및 복
+- health check 및 복구
 - server cluster 관리 (multi node kubernetes cluster)
 - Ingress : proxy server, 로드 밸런싱. HPA와 같이 사용하면 트래픽 처리에 대해 오토스케일링이 된다.
 - HPA (horizontal pod autoscaler) : 오토스케일링
