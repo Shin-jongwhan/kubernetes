@@ -69,26 +69,16 @@ sudo sysctl --system
 ```
 ### <br/>
 
-
-
-### kubectl 다운로드
-### 버전 호환은 공식 홈페이지에 해당 버전에서 2버전 차이 나는 것만 호환된다고 써져 있음
-#### 클러스터의 마이너(minor) 버전 차이 내에 있는 kubectl 버전을 사용해야 한다. 예를 들어, v1.32 클라이언트는 v1.31, v1.32, v1.33의 컨트롤 플레인과 연동될 수 있다. 호환되는 최신 버전의 kubectl을 사용하면 예기치 않은 문제를 피할 수 있다.
-### 최신 버전
+### cgroup 확인
+### 자세한 것은 공식 홈페이지 내용을 확인한다.
+#### ![image](https://github.com/user-attachments/assets/1f5c52ee-c5a6-430f-ad88-bca93b441929)
+#### [컨테이너 런타임](https://kubernetes.io/ko/docs/setup/production-environment/container-runtimes/)
 ```
-curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-```
-### 특정 버전
-```
-curl -LO https://dl.k8s.io/release/v1.32.0/bin/linux/amd64/kubectl
+docker info | grep -i cgroup
 ```
 ### <br/>
 
-### kubectl 설치
-```
-install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-```
-### 버전 확인은 다음과 같이 하면 된다.
+### kubectl 버전 확인
 ```
 kubectl version --client
 
