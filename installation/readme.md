@@ -2,10 +2,10 @@
 ### 241219
 ## install 방법
 ### 참고
-#### https://kubernetes.io/ko/docs/tasks/tools/install-kubectl-linux/
-#### https://kubernetes.io/ko/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#verify-mac-address
+#### [install-kubectl-linux](https://kubernetes.io/ko/docs/tasks/tools/install-kubectl-linux/)
+#### [install-kubeadm](https://kubernetes.io/ko/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#verify-mac-address)
+#### [컨테이너 런타임](https://kubernetes.io/ko/docs/setup/production-environment/container-runtimes/)
 ### <br/><br/>
-
 
 ### 쿠버네티스를 이용하려면 swap 이용을 꺼야 한다고 한다.
 ```
