@@ -95,3 +95,7 @@
 - Runc : 컨테이너 실행에 사용되는 기본 런타임.
 - Image Management : 컨테이너 이미지를 다운로드 및 실행.
 ### <br/><br/><br/>
+
+
+## docker를 설치하면 쿠버네티스와 연동이 가능한 이유
+### docker runtime은 containerd인데, 이 runtime 구조가 OCI 표준으로 만들어졌고, CRI로 쿠버네티스와 공유하기 있기 때문에 가능한 것이다.
