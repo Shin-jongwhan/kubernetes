@@ -74,7 +74,6 @@
 ## CRI-O
 ### CRI-O는 레드햇이 개발한 쿠버네티스 전용 컨테이너 런타임이다. 쿠버네티스에 최적화된 container runtime. docker보다 경량화되어 있다.
 ### Docker를 대체하기 위해 만들어졌으며, CRI를 통해 쿠버네티스와 직접 통신한다. 
-##### 나는 docker가 좋은데... ㅠ
 ### <br/>
 
 ### docker는 그 자체적으로 관리할 수 있도록 사실 굉장히 많은 기능을 가지고 있다. 그리고 docker compose, docker swarm과 같이 다른 기능들도 제공을 한다. 
@@ -98,4 +97,7 @@
 
 
 ## docker를 설치하면 쿠버네티스와 연동이 가능한 이유
-### docker runtime은 containerd인데, 이 runtime 구조가 OCI 표준으로 만들어졌고, CRI로 쿠버네티스와 공유하기 있기 때문에 가능한 것이다.
+### docker runtime은 containerd인데, 이 runtime 구조가 OCI 표준으로 만들어졌고, CRI로 쿠버네티스와 공유할 수 있기 때문에 가능한 것이다.
+##### 아래 이미지 출처를 모르겠다.
+#### ![image](https://github.com/user-attachments/assets/3dd07955-02cb-48f8-a7bb-884604840925)
+
