@@ -1,4 +1,5 @@
-### 241219
+# 미완성
+### 250206
 ## install 방법
 ### 참고
 #### [install-kubectl-linux](https://kubernetes.io/ko/docs/tasks/tools/install-kubectl-linux/)
