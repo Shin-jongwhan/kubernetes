@@ -78,12 +78,54 @@ ifconfig -a
 #### <br/>
 
 ### MAC 주소가 unique한지 확인한다.
+```
+cat /sys/class/dmi/id/product_uuid
+```
+### MAC과 NIC에 대한 자세한 내용은 아래를 참고한다.
+#### https://github.com/Shin-jongwhan/network/blob/main/NIC_Network_Interface_Card/readme.md
+#### <br/>
+
 ### Kubernetes는 각 노드를 식별하기 위해 product_uuid 또는 MAC 주소를 사용한다. 따라서 각 노드의 product_uuid 또는 MAC 주소는 반드시 고유해야 한다.
 ### VM 환경일 때는?
 - 서버가 VM이라도 괜찮다. VM은 가상화 플랫폼(VMware 등... 내 케이스의 경우 proxmux)이 MAC 주소를 자동으로 생성해준다.
 - 좀 더 자세히 말하면 가상 머신은 '가상 네트워크 카드'를 사용한다.
+### kubernetes는 docker virtual NIC를 이용하는 건 아니다. ens18 (나 같은 경우 VM 환경이고, ens18은 가상화 플랫폼이 생성해준 virtual NIC이다)과 같은 걸 이용하는 거다. 
+### <br/>
+
+### 6443 포트 열려있는지 확인
+#### 먼저 방화벽에서 포트를 차단하는지 확인한다.
+#### 방화벽은 ufw, firewalld 두 개를 많이 쓰는데 둘 다 확인하자.
 ```
-cat /sys/class/dmi/id/product_uuid
+sudo ufw status
+systemctl status firewalld
 ```
+### <br/>
+
+### nc (netcat, 포트 열려있는지 테스트하는 명령어)로 확인한다.
+#### * 참고 : Kubernetes API Server에서 사용하는 포트이다. 만약 API server가 열려있지 않다면 그래도 connection refused가 나올 것이다. 방화벽에서 포트가 열려있다면 넘어가자.
+- 127.0.0.1 : 테스트할 IP 주소 (로컬)
+- 6443 : 테스트할 포트 번호
+- -z : 연결만 시도하고 데이터 전송 안 함
+- -v : 자세한 출력
+- -w 2 : 연결 타임아웃 2초 설정
+```
+nc 127.0.0.1 6443 -zv -w 2
+```
+### <br/>
+
+## Installing kubeadm, kubelet and kubectl
+### 각 software에 대한 설명
+#### 공식 docs에는 이렇게 적혀 있다.
+- kubeadm: the command to bootstrap the cluster.
+- kubelet: the component that runs on all of the machines in your cluster and does things like starting pods and containers.
+- kubectl: the command line util to talk to your cluster.
+### <br/>
+
+### 역할, 설치 위치
+| 구성 요소         | 역할                                          | 어디에 설치해야 하나요?                             |
+| ------------- | ------------------------------------------- | ----------------------------------------- |
+| **`kubeadm`** | 클러스터를 초기화(`init`)하거나 워커 노드로 연결(`join`)하는 도구 | ✅ **모든 노드 (마스터 + 워커)**                    |
+| **`kubelet`** | 각 노드에서 Pod을 실행하고 관리하는 실제 에이전트               | ✅ **모든 노드 (마스터 + 워커)**                    |
+| **`kubectl`** | 클러스터를 제어하는 CLI 도구 (`get pods`, `apply`, 등)  | 🔸 **선택적** (보통 마스터 노드 또는 운영자의 로컬 PC에만 설치) |
 ### <br/>
 
