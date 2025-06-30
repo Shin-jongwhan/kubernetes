@@ -149,4 +149,21 @@ sudo apt-mark hold kubelet kubeadm kubectl
 #### ![image](https://github.com/user-attachments/assets/5b9669d5-5164-4003-951f-cee0ec98054c)
 ### <br/><br/>
 
-### 
+## Creating a cluster with kubeadm
+#### https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/
+### kubeadm을 사용하면 Kubernetes의 모범 사례에 부합하는 최소한의 실행 가능한(Minimum Viable) 클러스터를 만들 수 있고, 실제로 Kubernetes Conformance 테스트를 통과할 수 있는 클러스터를 구축할 수 있다고 한다.
+#### ![image](https://github.com/user-attachments/assets/937e53ef-6992-4b22-a07d-f89ffd3e4389)
+#### <br/>
+
+### Kubernetes Conformance 테스트란?
+- Kubernetes Certified 제품임을 입증하기 위해 거쳐야 하는 테스트 스위트
+- API, 동작, 기능이 공식 Kubernetes 사양과 일치하는지 확인함
+- CNCF(Cloud Native Computing Foundation)에서 인증하는 데 사용됨
+#### <br/>
+
+### kubeadm을 사용하면
+#### kubeadm으로 설치한 클러스터는 정식 Kubernetes 사양에 부합하는 구조를 만들 수 있고,
+#### 테스트 통과 및 인증 기반의 배포에도 적합한 수준의 품질을 제공한다는 의미이다.
+#### 만약 기업 환경이나 표준 기반의 서비스 인프라를 구축하고자 한다면, kubeadm은 좋은 출발점이다.
+### <br/>
+
