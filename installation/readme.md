@@ -13,7 +13,7 @@
 ### <br/><br/>
 
 ## Download Kubernetes (넘어가기)
-### [Installing tools](https://github.com/Shin-jongwhan/kubernetes/tree/main/installation#install-kubeadm) 에서 한 번에 kubeadm, kubelet, kubectl를 설치할 것이다. 참고만 하기.
+### [Install kubeadm](https://github.com/Shin-jongwhan/kubernetes/tree/main/installation#install-kubeadm) 에서 한 번에 kubeadm, kubelet, kubectl를 설치할 것이다. 참고만 하기.
 #### https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
 ### kubectl을 local에 설치
 ### 나는 binary로 설치했다.
@@ -135,6 +135,7 @@ nc 127.0.0.1 6443 -zv -w 2
 #### <br/>
 
 ### kubeadm, kubelet, kubectl 설치 
+#### * 참고 : 위 테이블에서 보면 kubeadm, kubelet은 master, worker node 공통으로 설치하고, kubectl은 master node에만 설치한다.
 ```
 sudo apt-get update
 sudo apt-get install -y kubelet kubeadm kubectl
