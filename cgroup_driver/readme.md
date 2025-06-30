@@ -1,5 +1,6 @@
 ### 250630
 # cgroup driver (control group driver)
+#### https://kubernetes.io/docs/setup/production-environment/container-runtimes/#cgroup-drivers
 ### cgroup driver는 Kubernetes에서 리눅스의 리소스 cgroup이란?제어 기능(cgroups) 을 어떻게 사용할지 결정하는 중요한 설정
 ### Kubernetes 클러스터의 안정성과 성능에 직접 영향을 주는 요소
 ### <br/><br/>
