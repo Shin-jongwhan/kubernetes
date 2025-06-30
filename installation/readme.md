@@ -12,7 +12,8 @@
 #### 배를 하나 만들고, container를 운영하는 것을 나타내는 것에 대해 비유적으로 아주 잘 설명해준다.
 ### <br/><br/>
 
-## Download Kubernetes
+## Download Kubernetes (넘어가기)
+### [Installing tools](https://github.com/Shin-jongwhan/kubernetes/tree/main/installation#install-tools) 에서 한 번에 kubeadm, kubelet, kubectl를 설치할 것이다. 참고만 하기.
 #### https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
 ### kubectl을 local에 설치
 ### 나는 binary로 설치했다.
@@ -127,5 +128,15 @@ nc 127.0.0.1 6443 -zv -w 2
 | **`kubeadm`** | 클러스터를 초기화(`init`)하거나 워커 노드로 연결(`join`)하는 도구 | ✅ **모든 노드 (마스터 + 워커)**                    |
 | **`kubelet`** | 각 노드에서 Pod을 실행하고 관리하는 실제 에이전트               | ✅ **모든 노드 (마스터 + 워커)**                    |
 | **`kubectl`** | 클러스터를 제어하는 CLI 도구 (`get pods`, `apply`, 등)  | 🔸 **선택적** (보통 마스터 노드 또는 운영자의 로컬 PC에만 설치) |
-### <br/>
+#### <br/>
 
+### 참고, pkgs.k8s.io를 쓰라고 한다.
+#### ![image](https://github.com/user-attachments/assets/e8f3bc00-df3e-485c-88d9-9e07e0a91e1a)
+#### <br/>
+
+### kubeadm, kubelet, kubectl 설치 
+```
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
+```
