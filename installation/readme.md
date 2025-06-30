@@ -156,7 +156,7 @@ sudo apt-mark hold kubelet kubeadm kubectl
 #### <br/>
 
 ### Kubernetes Conformance 테스트란?
-- Kubernetes Certified 제품임을 입증하기 위해 거쳐야 하는 테스트 스위트
+- Kubernetes Certified 제품임을 입증하기 위해 거쳐야 하는 테스트 스위트(여러 개의 테스트 케이스들을 모은 그룹)
 - API, 동작, 기능이 공식 Kubernetes 사양과 일치하는지 확인함
 - CNCF(Cloud Native Computing Foundation)에서 인증하는 데 사용됨
 #### <br/>
