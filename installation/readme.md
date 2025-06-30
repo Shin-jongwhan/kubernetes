@@ -141,3 +141,12 @@ sudo apt-get update
 sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
 ```
+### <br/>
+
+### 다음으로 cgroup을 configure 하라고 나와 있는데, default가 systemd라서 그냥 건드릴 필요 없이 systemctl로 이용하면 된다.
+### 자세한 내용은 아래 참고
+#### https://github.com/Shin-jongwhan/kubernetes/tree/main/cgroup_driver
+#### ![image](https://github.com/user-attachments/assets/5b9669d5-5164-4003-951f-cee0ec98054c)
+### <br/><br/>
+
+### 
