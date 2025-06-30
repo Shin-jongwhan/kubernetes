@@ -13,7 +13,7 @@
 ### <br/><br/>
 
 ## Download Kubernetes (넘어가기)
-### [Installing tools](https://github.com/Shin-jongwhan/kubernetes/tree/main/installation#install-tools) 에서 한 번에 kubeadm, kubelet, kubectl를 설치할 것이다. 참고만 하기.
+### [Installing tools](https://github.com/Shin-jongwhan/kubernetes/tree/main/installation#install-kubeadm) 에서 한 번에 kubeadm, kubelet, kubectl를 설치할 것이다. 참고만 하기.
 #### https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
 ### kubectl을 local에 설치
 ### 나는 binary로 설치했다.
@@ -59,7 +59,7 @@ kubectl version --client --output=yaml
 ### 나는 service, db, backend 서버가 있고 service를 마스터로, db, backend를 worker로 구성할 것이다. 이를 위해 kubeadm을 사용할 것이다.
 ### <br/><br/>
 
-## kubeadm
+## install kubeadm
 #### https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
 ### 아래와 같이 서버 구성이 되어 있어야 한다.
 #### ![image](https://github.com/user-attachments/assets/83865713-137e-4e1a-a452-99a49438a4a0)
