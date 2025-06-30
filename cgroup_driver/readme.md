@@ -21,6 +21,17 @@
 | **`systemd`**  | systemd가 cgroup을 관리         | 최신 Kubernetes & containerd 기본값 |
 ### <br/>
 
+### cgroup driver가 불일치할 경우 
+| 상황       | 결과                                                |
+| -------- | ------------------------------------------------- |
+| 드라이버 불일치 | kubelet이 컨테이너 관리 실패, Pod 안 뜸, kubelet crash 발생 가능 |
+| 드라이버 일치  | 안정적인 컨테이너 실행, 리소스 제어 정상 작동                        |
+### <br/>
+
+### 1.22 버전 이후로는 default가 systemd라고 공식 docs에 나와있다.
+#### ![image](https://github.com/user-attachments/assets/73011d64-29d7-40dc-9190-c9f05ae5c543)
+### <br/>
+
 ## (참고) systemd
 ### '리눅스에서 시스템과 서비스(데몬)의 부팅과 실행을 관리하는 초기화 시스템(init system)'이다.
 ### Linux 시스템에서 서비스 실행, 프로세스 관리, 로그 기록, 부팅 순서 등을 총괄하는 init 시스템
