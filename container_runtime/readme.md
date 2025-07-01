@@ -239,14 +239,51 @@ nerdctl run -d --name web nginx
 
 #### <br/>
 
-### 상황 별 추천 도구
-#### 🚀 개발용은 Docker,
-#### 🛡 운영용은 Podman (or CRI-O/containerd)
-| 상황                                                  | 추천 도구                        | 이유             |
-| --------------------------------------------------- | ---------------------------- | -------------- |
-| **로컬에서 Docker Hub 기반 이미지로 개발 중이고, Kubernetes는 실험용** | ✅ **Docker + cri-dockerd**   | 가장 빠르게 시작 가능   |
-| **보안 중요 + Kubernetes 중심의 운영 환경을 구성 중**              | ✅ **Podman + CRI-O**         | 공식 지원, 가볍고 안정적 |
-| **향후 클라우드/Red Hat/OpenShift 기반으로 확장할 계획**           | ✅ **Podman (또는 containerd)** | 생태계와의 호환성 우수   |
+### ❗ 중요 : docker가 아닌 다른 container runtime을 사용하는 게 best practice라는 말은 아니다. 
+### 분명히 공식 docs에도 docker engine을 지원하고 있고, 오해하지 말아야 할 것이 containerd, CRI-O 또한 데몬이라는 점이다.
+### podman이 데몬으로 실행이 안 되는 것일 뿐이다.
+### 공식 docs의 best practice에도 docker는 써져 있고, containerd나 CRI-O를 사용하라고 나와 있지 않다. 
+#### https://kubernetes.io/docs/setup/best-practices/node-conformance/
+#### ![image](https://github.com/user-attachments/assets/a0c9d615-1e3b-451b-8da5-9b5b995a919d)
+### <br/><br/>
 
+## 보안 문제
+### 아래 블로그 글에서 아주 자세하게 정리를 잘 해주었다. 
+#### https://www.radsecurity.ai/blog/container-runtime
+### RAD Security의 해당 글에서는 **어떤 container runtime을 선택하느냐보다**, **런타임 보안 체계를 어떻게 구축하느냐**가 훨씬 더 중요하다는 관점에서 접근하고 있다.
 ### <br/>
 
+### RAD Security가 이야기하는 핵심 포인트들
+1. **컨테이너 이미지 업데이트 및 취약점 스캔**
+   - 최신 패치 적용, CI/CD에서 이미지 취약점 탐지 및 자동 업데이트 권장
+2. **강력한 격리 메커니즘 활용**
+   - 네임스페이스, cgroups, SELinux/AppArmor 등을 통해 격리 강화
+3. **최소 권한 원칙(Lowest privilege)**
+   - 컨테이너는 가능한 root 없이 실행하고, 커널 권한도 최소로 제한
+4. **오케스트레이터 보안 강화**
+   - 네트워크 정책, PSP, RBAC 등 Kubernetes 내 보안 정책 적용
+5. **정기적인 보안 감사 및 모니터링**
+   - 실행 중 이상 징후를 eBPF 기반 툴 등으로 모니터링하고 감사 로깅 사용
+6. **런타임 환경의 지속적 패칭 및 업데이트**
+   - Docker, containerd, CRI-O 등 컨테이너 런타임도 최신으로 유지
+### <br/>
+
+### 어떤 런타임이 "더 낫다"라고 말하지 않음
+- 글 자체에서는 Docker, containerd, CRI-O 등 모두 언급하지만,
+- **보안 체계를 어떻게 강화할 것인지**가 글의 핵심이며,
+- 특정 런타임을 추천하지는 않는다.
+### <br/>
+
+### ✅ 판단 기준: “어떤 런타임을 사용하냐” 보다 "어떤 보안 전략을 적용하냐"
+### 이런 요소들을 어떻게 구현할 수 있느냐가 **보안 완성도**를 결정한다.
+- 이미지 취약점 스캔
+- 격리 네임스페이스 및 권한 구성
+- 이상 행동 모니터링 (Falco, Tetragon 등)
+- Runtime 정기 업데이트 및 감사
+### <br/>
+
+### 결론
+### **RAD Security의 관점에서는 런타임 선택보다, ‘보안 프로세스와 툴’이 더 중요하다.**
+-  ✅ 이미지 스캔, 격리, 권한 제한
+-  ✅ 이상 감지와 감사 로깅
+-  ✅ 런타임 자체의 최신화
