@@ -178,4 +178,15 @@ nerdctl run -d --name web nginx
 
 ### `질문` : docker를 사용하고 있다면 docker + cri-dockerd를 사용하는 게 적절한가?
 ### 그렇다.
+### 하지만 containerd나 CRI-O를 사용할 수도 있다.
+#### <br/>
+
+### containerd / CRI-O를 Docker 대신 써도 되는 이유
+| 이유                     | 설명                                                  |
+| ---------------------- | --------------------------------------------------- |
+| 📦 컨테이너 이미지 포맷         | Docker와 동일한 **OCI 이미지 포맷**을 사용                      |
+| 🔄 이미지 호환성             | Docker Hub 이미지도 `containerd`, `CRI-O`에서 그대로 pull 가능 |
+| 🎯 목적이 Kubernetes라면    | `containerd`, `CRI-O`가 **Kubernetes에 더 최적화**됨       |
+| ✅ 클라우드/운영환경에서 실질적으로 사용 | EKS, GKE, AKS 등은 모두 containerd 사용 중                 |
+
 ### <br/>
