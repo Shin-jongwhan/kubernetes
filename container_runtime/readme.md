@@ -180,7 +180,6 @@ nerdctl run -d --name web nginx
 ### podman은 데몬이 없기 때문에 더 가볍다.
 #### https://wing-beat.tistory.com/122
 #### ![image](https://github.com/user-attachments/assets/38426ef4-b857-48e1-b69d-50fba5c3dd7e)
-### 아래 내용을 보면 전반적으로 kubernetes가 가고자하는 방향과 일치한다.
 #### ![image](https://github.com/user-attachments/assets/1e968199-a41d-4453-bf62-6885a7071bd5)
 
 ### <br/>
