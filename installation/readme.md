@@ -278,3 +278,31 @@ vi /etc/fstab
 ### free -h로 메모리를 확인했을 때 swap 항목이 0이 되었는지 확인한다.
 #### ![image](https://github.com/user-attachments/assets/ef8f5951-d84f-4554-b03d-5b9ea4797a95)
 ### <br/>
+
+### ansible playbook은 아래를 참고한다.
+### [add_user_docker_group.yml](https://github.com/Shin-jongwhan/IaC_infrastructure_as_code/blob/main/ansible/playbook/disable_swap_memory.yml)
+### <br/><br/>
+
+## kubeadm config
+### 컨트롤 플레인을 띄우기 위한 작업이다.
+### init config 파일 생성
+```
+kubeadm config print init-defaults > kubeadm-init.yaml
+```
+### <br/>
+
+### 아래를 수정해준다.
+- IP : private IP를 사용해도 되고, 공인 IP를 사용해도 되는데 보통은 private IP를 사용한다.
+- hostname : null로 그냥 둬도 되긴 한데, 명시해주는 게 좋다.
+- criSocket : 나는 docker로 써서 kubernetes에서 인식할 수 있는 URI 형식으로 써준다.
+```
+localAPIEndpoint:
+  advertiseAddress: [IP]
+  bindPort: 6443
+nodeRegistration:
+  criSocket: unix:///var/run/dockershim.sock
+  imagePullPolicy: IfNotPresent
+  imagePullSerial: true
+  name: [hostname]
+  taints: null
+```
