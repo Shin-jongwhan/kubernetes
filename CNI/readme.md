@@ -2,6 +2,7 @@
 # CNI (Container Network Interface)
 ### Kubernetes에서 Pod 간 네트워크를 구성하기 위한 플러그인 표준 인터페이스.
 ### 즉, 각 Pod가 네트워크에 참여하고 서로 통신할 수 있도록 도와주는 구성 요소이다.
+### ❗ CNI가 있어야 pod 간 통신이 가능해진다.
 ### <br/>
 
 ### CNI가 없으면 생기는 문제
@@ -28,100 +29,150 @@
 ## 대표적인 CNI 플러그인 종류
 ### 1. **Calico**
 
-* ✅ **특징**
+- ✅ **특징**
 
-  * 빠르고 확장성 뛰어남
-  * 네트워크 정책(NetworkPolicy) 지원
-  * 실무에서 가장 많이 사용됨
-* 🔧 **설치 방법**
+  - 빠르고 확장성 뛰어남
+  - 네트워크 정책(NetworkPolicy) 지원
+  - 실무에서 가장 많이 사용됨
+- 🔧 **설치 방법**
 
   ```bash
   kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/calico.yaml
   ```
-* ⚙️ **동작 방식 / 구조 설명**
+- ⚙️ **동작 방식 / 구조 설명**
 
-  * L3 기반 라우팅 방식
-  * 각 노드에서 BGP 또는 IP-in-IP를 통해 Pod 간 통신
-  * iptables를 통한 정책 제어
-  * etcd 또는 Kubernetes API를 데이터 저장소로 사용
+  - L3 기반 라우팅 방식
+  - 각 노드에서 BGP 또는 IP-in-IP를 통해 Pod 간 통신
+  - iptables를 통한 정책 제어
+  - etcd 또는 Kubernetes API를 데이터 저장소로 사용
+- 장단점
+  - ✅ Pod에 고유한 IP 할당
+  - ✅ Pod 간 통신 설정 (L3 라우팅 기반)
+  - ✅ 네트워크 정책 지원 (보안 제어) ← 강력함
+  - ✅ BGP 또는 IP-in-IP로 통신 최적화
+  - ✅ 클러스터 간 라우팅 및 외부 통신 구성 가능
+  - ❌ L7 레벨 제어는 불가
+- 📌 적합한 경우: 보안이 중요하고 실서비스에서 쓰는 경우
 
 #### <br/> 
 
 ### 2. **Flannel**
 
-* ✅ **특징**
+- ✅ **특징**
 
-  * 가장 단순하고 가벼움
-  * 네트워크 정책 미지원
-  * 테스트나 소규모 환경에 적합
-* 🔧 **설치 방법**
+  - 가장 단순하고 가벼움
+  - 네트워크 정책 미지원
+  - 테스트나 소규모 환경에 적합
+- 🔧 **설치 방법**
 
   ```bash
   kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
   ```
-* ⚙️ **동작 방식 / 구조 설명**
+- ⚙️ **동작 방식 / 구조 설명**
 
-  * L2 오버레이 네트워크
-  * VXLAN, host-gw, IP-in-IP 등의 백엔드를 사용해 Pod 간 통신
-  * Pod 네트워크를 오버레이로 연결
+  - L2 오버레이 네트워크
+  - VXLAN, host-gw, IP-in-IP 등의 백엔드를 사용해 Pod 간 통신
+  - Pod 네트워크를 오버레이로 연결
+- 장단점
+  - ✅ Pod에 IP 할당
+  - ✅ Pod 간 통신 설정 (VXLAN, host-gw 등)
+  - ❌ 네트워크 정책 미지원
+  - ❌ 복잡한 보안 제어 없음
+  - ✅ 설치가 매우 간단하고 빠름
+- 📌 적합한 경우: 테스트용, PoC, 소규모 단순 구성
 
 #### <br/> 
 
 ### 3. **Cilium**
 
-* ✅ **특징**
+- ✅ **특징**
 
-  * 고성능, 차세대 네트워킹 솔루션
-  * eBPF 기반으로 커널 레벨에서 동작
-  * L3\~L7 네트워크 정책까지 지원
-* 🔧 **설치 방법**
+  - 고성능, 차세대 네트워킹 솔루션
+  - eBPF 기반으로 커널 레벨에서 동작
+  - L3\~L7 네트워크 정책까지 지원
+- 🔧 **설치 방법**
 
   ```bash
   kubectl apply -f https://raw.githubusercontent.com/cilium/cilium/v1.15.3/install/kubernetes/quick-install.yaml
   ```
-* ⚙️ **동작 방식 / 구조 설명**
+- ⚙️ **동작 방식 / 구조 설명**
 
-  * 커널의 eBPF 기능을 사용하여 트래픽을 제어 (iptables 거의 사용 안 함)
-  * HTTP, gRPC 등 애플리케이션 계층까지 정책 제어 가능
-  * 고성능, 저지연 통신에 최적화
+  - 커널의 eBPF 기능을 사용하여 트래픽을 제어 (iptables 거의 사용 안 함)
+  - HTTP, gRPC 등 애플리케이션 계층까지 정책 제어 가능
+  - 고성능, 저지연 통신에 최적화
+- 장단점
+  - ✅ Pod에 IP 할당
+  - ✅ Pod 간 통신 (eBPF 기반, 고성능)
+  - ✅ L3 ~ L7 네트워크 정책 모두 지원 (HTTP, gRPC까지 제어)
+  - ✅ DNS 기반 정책도 가능
+  - ✅ iptables 안 씀 → 성능 좋고 CPU 적게 사용
+- 📌 적합한 경우: 보안 + 고성능 + 트래픽 제어가 중요한 실무
+
+
 
 #### <br/> 
 
 ### 4. **Weave Net**
 
-* ✅ **특징**
+- ✅ **특징**
 
-  * 설치 간편, 자동 IP 할당
-  * 소규모 또는 개발 환경에 적합
-  * 자체 암호화 지원
-* 🔧 **설치 방법**
+  - 설치 간편, 자동 IP 할당
+  - 소규모 또는 개발 환경에 적합
+  - 자체 암호화 지원
+- 🔧 **설치 방법**
 
   ```bash
   kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
   ```
-* ⚙️ **동작 방식 / 구조 설명**
+- ⚙️ **동작 방식 / 구조 설명**
 
-  * 자체 오버레이 네트워크 프로토콜 사용
-  * Weave DNS를 포함해 이름 기반 Pod 간 통신 가능
-  * 노드 간 직접 연결 (암호화 가능)
+  - 자체 오버레이 네트워크 프로토콜 사용
+  - Weave DNS를 포함해 이름 기반 Pod 간 통신 가능
+  - 노드 간 직접 연결 (암호화 가능)
+- 장단점
+  - ✅ Pod에 IP 할당
+  - ✅ 오버레이 네트워크 구성
+  - ✅ 간단한 네트워크 정책 지원
+  - ✅ 자동 암호화 (옵션)
+  - ❌ L7 정책, 고급 트래픽 제어는 미지원
+  - ✅ 설치 및 운영이 매우 쉬움
+- 📌 적합한 경우: 개발/테스트 환경, 단일 노드 또는 소규모 클러스터
+
 
 #### <br/> 
 
 ### 5. **Canal**
 
-* ✅ **특징**
+- ✅ **특징**
 
-  * Calico와 Flannel의 조합형
-  * Flannel의 오버레이 + Calico의 정책 기능
-  * 네트워크 정책이 필요한 경량 환경에 적합
-* 🔧 **설치 방법**
+  - Calico와 Flannel의 조합형
+  - Flannel의 오버레이 + Calico의 정책 기능
+  - 네트워크 정책이 필요한 경량 환경에 적합
+- 🔧 **설치 방법**
 
   ```bash
   kubectl apply -f https://docs.projectcalico.org/manifests/canal.yaml
   ```
-* ⚙️ **동작 방식 / 구조 설명**
+- ⚙️ **동작 방식 / 구조 설명**
 
-  * Flannel로 Pod 간 오버레이 통신 구성
-  * Calico의 iptables 기반 정책 제어 적용
-  * etcd 없이 Kubernetes API만으로 동작 가능
+  - Flannel로 Pod 간 오버레이 통신 구성
+  - Calico의 iptables 기반 정책 제어 적용
+  - etcd 없이 Kubernetes API만으로 동작 가능
+- 장단점
+  - ✅ Pod에 IP 할당 (Flannel 사용)
+  - ✅ Pod 간 통신 (VXLAN 기반)
+  - ✅ 네트워크 정책 지원 (Calico의 정책 기능)
+  - ✅ 가볍고 설치 간단
+  - ❌ L7 정책은 미지원
+- 📌 적합한 경우: Flannel처럼 단순하지만 보안도 약간 필요한 환경
 
+### <br/>
+
+### 정리
+| 플러그인    | 네트워크 정책     | 고성능 (eBPF 등) | 보안 제어  | 설치 난이도    |
+| ------- | ----------- | ------------ | ------ | --------- |
+| Calico  | ✅ L3 정책     | ❌            | 강력함    | 중간        |
+| Flannel | ❌ 없음        | ❌            | 없음     | 매우 쉬움     |
+| Cilium  | ✅ L3\~L7 정책 | ✅ eBPF       | 매우 강력함 | 보통\~약간 복잡 |
+| Weave   | 🔶 제한적      | ❌            | 중간     | 매우 쉬움     |
+| Canal   | ✅ L3 정책     | ❌            | 보통     | 쉬움        |
