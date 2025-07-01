@@ -117,13 +117,11 @@
 ### <br/><br/>
 
 ## 질문
-### 질문 : 나는 container image가 docker hub에 올라가 있고, 여기서 image를 관리하고 있다. 그러면 나는 docker와 연동할 수 있는 방법을 찾는게 맞는 것인가?
+### `질문` : 나는 container image가 docker hub에 올라가 있고, 여기서 image를 관리하고 있다. 그러면 나는 docker와 연동할 수 있는 방법을 찾는게 맞는 것인가?
 ### 그렇다.
 ### <br/>
 
----
-
-### 질문 : 그러면 여기서 다시 이런 생각이 드는데, 다른 container runtime을 사용하는 사람들은 container image를 어떻게 관리하고 있는 것인가?
+### `질문` : 그러면 여기서 다시 이런 생각이 드는데, 다른 container runtime을 사용하는 사람들은 container image를 어떻게 관리하고 있는 것인가?
 ### containerd나 CRI-O를 사용하는 사람들은 Docker 없이도 컨테이너 이미지를 잘 관리하고 있다. 
 #### Docker가 없어도 container image는 OCI(Open Container Initiative) 표준이기 때문에, containerd, CRI-O도 Docker Hub에 있는 이미지 pull/push/관리 전부 가능하다.
 #### <br/>
@@ -178,8 +176,6 @@ nerdctl run -d --name web nginx
 - Red Hat, Fedora 계열에서 기본 채택 중
 ### <br/>
 
----
-
-### 질문 : docker를 사용하고 있다면 docker + cri-dockerd를 사용하는 게 적절한가?
+### `질문` : docker를 사용하고 있다면 docker + cri-dockerd를 사용하는 게 적절한가?
 ### 그렇다.
 ### <br/>
