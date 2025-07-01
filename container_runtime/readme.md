@@ -174,6 +174,15 @@ nerdctl run -d --name web nginx
 - Docker CLI와 거의 호환
 - rootless로도 작동 가능 (보안 측면 우수)
 - Red Hat, Fedora 계열에서 기본 채택 중
+#### <br/>
+
+### 아래 블로그에서 좀 더 내용을 참고해보자.
+### podman은 데몬이 없기 때문에 더 가볍다.
+#### https://wing-beat.tistory.com/122
+#### ![image](https://github.com/user-attachments/assets/38426ef4-b857-48e1-b69d-50fba5c3dd7e)
+### 아래 내용을 보면 전반적으로 kubernetes가 가고자하는 방향과 일치한다.
+#### ![image](https://github.com/user-attachments/assets/1e968199-a41d-4453-bf62-6885a7071bd5)
+
 ### <br/>
 
 ### `질문` : docker를 사용하고 있다면 docker + cri-dockerd를 사용하는 게 적절한가?
@@ -188,5 +197,14 @@ nerdctl run -d --name web nginx
 | 🔄 이미지 호환성             | Docker Hub 이미지도 `containerd`, `CRI-O`에서 그대로 pull 가능 |
 | 🎯 목적이 Kubernetes라면    | `containerd`, `CRI-O`가 **Kubernetes에 더 최적화**됨       |
 | ✅ 클라우드/운영환경에서 실질적으로 사용 | EKS, GKE, AKS 등은 모두 containerd 사용 중                 |
+#### <br/>
+
+### 단, 아래와 같은 것들이 변화가 생긴다.
+| 항목        | Docker 사용                   | containerd/CRI-O 사용                    |
+| --------- | --------------------------- | -------------------------------------- |
+| 이미지 빌드    | `docker build`              | `nerdctl build` / `podman build`       |
+| 실행/테스트    | `docker run`, `docker exec` | `nerdctl run` / `podman run`           |
+| 컨테이너 관리   | `docker ps`, `docker logs`  | `ctr`, `crictl`, `nerdctl`, `podman` 등 |
+| 로컬 이미지 확인 | `docker images`             | `ctr images list`, `nerdctl images` 등  |
 
 ### <br/>
