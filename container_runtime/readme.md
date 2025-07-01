@@ -208,3 +208,46 @@ nerdctl run -d --name web nginx
 | 로컬 이미지 확인 | `docker images`             | `ctr images list`, `nerdctl images` 등  |
 
 ### <br/>
+
+### `질문` : podman vs docker
+### 뭐든 상관 없지만 docker는 데몬이 떠 있고 데몬이 root user로 실행 중인 건데 일반 사용자도 실행할 수 있다는 게 문제가 된다. 
+### 그런데 이 문제 때문에 podman을 사용하는 건 아니고 주된 목적은 **데몬리스 경량화 환경을 제공하기 위함**이다.
+### 아래 reddit에 보면 어느 유저가 잘 설명해주었다.
+#### https://www.reddit.com/r/kubernetes/comments/10yckjz/podman_vs_docker_in_kubernete/
+### gpt 요약
+#### ![image](https://github.com/user-attachments/assets/f5a06bac-425e-421a-9bbc-46997b7d6e81)
+#### ![image](https://github.com/user-attachments/assets/e28cc572-0bb2-4ef4-bd3f-816e79b66cfa)
+### 정리
+| 정리 항목                    | 내용                                     |
+| ------------------------ | -------------------------------------- |
+| Docker 보안 문제             | 데몬이 root인데 일반 사용자도 명령 가능 (docker.sock) |
+| Podman/CRI-O 등장 이유       | 보안보단 Kubernetes에 최적화된 구조, 가벼운 런타임 추구   |
+| Kubernetes에서 containerd는 | root로 실행되지만 사용자 접근이 제한되어 있어 실질 문제 없음   |
+| 루트리스 Kubernetes          | 점차 개발 중, 실험적 기능 제공됨                    |
+
+### <br/>
+
+### `질문` : 그러면 podman이랑 docker 둘 중에 뭘 사용해야 하는 것인가?
+| 항목                              | Docker 적합                      | Podman 적합                       |
+| ------------------------------- | ------------------------------ | ------------------------------- |
+| ✅ **Kubernetes와 연동**            | `cri-dockerd`가 필요함 (공식 지원 중단됨) | CRI-O와 함께 공식적으로 사용됨             |
+| 🧱 **단순 개발/테스트**                | 사용 편하고 익숙한 CLI                 | Docker와 유사, rootless 사용 가능      |
+| 🐳 **이미지 빌드/관리**                | Docker Hub와의 통합이 자연스러움         | Docker Hub 사용 가능 (다만 약간의 설정 필요) |
+| 🔐 **보안 요구**                    | 데몬 기반, 루트 권한 이슈 있음             | 데몬리스, rootless 가능, 보안성 높음       |
+| 🧪 **개발자 환경**                   | 익숙함이 장점                        | 보안과 가벼움이 장점                     |
+| 🏭 **운영 환경 / 프로덕션**             | ❌ 권장하지 않음                      | ✅ Red Hat, OpenShift 등에서 사용 중   |
+| 🔌 **추가 기능 (Compose, Swarm 등)** | 포함됨 (다소 무거움)                   | 미포함, 필요하면 따로 도구 설치              |
+
+#### <br/>
+
+### 상황 별 추천 도구
+#### 🚀 개발용은 Docker,
+#### 🛡 운영용은 Podman (or CRI-O/containerd)
+| 상황                                                  | 추천 도구                        | 이유             |
+| --------------------------------------------------- | ---------------------------- | -------------- |
+| **로컬에서 Docker Hub 기반 이미지로 개발 중이고, Kubernetes는 실험용** | ✅ **Docker + cri-dockerd**   | 가장 빠르게 시작 가능   |
+| **보안 중요 + Kubernetes 중심의 운영 환경을 구성 중**              | ✅ **Podman + CRI-O**         | 공식 지원, 가볍고 안정적 |
+| **향후 클라우드/Red Hat/OpenShift 기반으로 확장할 계획**           | ✅ **Podman (또는 containerd)** | 생태계와의 호환성 우수   |
+
+### <br/>
+
