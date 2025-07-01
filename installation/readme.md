@@ -152,6 +152,8 @@ sudo apt-mark hold kubelet kubeadm kubectl
 ## Creating a cluster with kubeadm
 #### https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/
 ### kubeadm을 사용하면 Kubernetes의 모범 사례에 부합하는 최소한의 실행 가능한(Minimum Viable) 클러스터를 만들 수 있고, 실제로 Kubernetes Conformance 테스트를 통과할 수 있는 클러스터를 구축할 수 있다고 한다.
+### 나는 ansible을 별도로 사용하고 있고, 아래에 kubernetes 설치 관련해서 playbook도 정리하였다.
+#### https://github.com/Shin-jongwhan/IaC_infrastructure_as_code/tree/main/ansible/playbook
 #### ![image](https://github.com/user-attachments/assets/937e53ef-6992-4b22-a07d-f89ffd3e4389)
 #### <br/>
 
@@ -165,5 +167,45 @@ sudo apt-mark hold kubelet kubeadm kubectl
 #### kubeadm으로 설치한 클러스터는 정식 Kubernetes 사양에 부합하는 구조를 만들 수 있고,
 #### 테스트 통과 및 인증 기반의 배포에도 적합한 수준의 품질을 제공한다는 의미이다.
 #### 만약 기업 환경이나 표준 기반의 서비스 인프라를 구축하고자 한다면, kubeadm은 좋은 출발점이다.
+### <br/>
+
+### 업그레이드가 필요한 경우 아래 참고
+#### https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/upgrading-linux-nodes/
+### 버전 확인
+```
+kubectl version --client
+kubeadm version
+kubelet --version
+```
+#### ![image](https://github.com/user-attachments/assets/a1b03211-5339-4673-b4a1-23c9bcc9f624)
+#### <br/>
+
+### kubelet은 에이전트이기 때문에 업그레이드하면 restart 해야 한다(자세한 내용은 위 upgrading-linux-nodes 링크 참고).
+```
+sudo systemctl daemon-reload
+sudo systemctl restart kubelet
+```
+### <br/>
+
+### 여기서는 이걸 할 거임
+- Install a single control-plane Kubernetes cluster
+- Install a Pod network on the cluster so that your Pods can talk to each other
+### <br/>
+
+### kubeadm의 네트워크 인식 방법
+#### kubeadm과 다른 Kubernetes 컴포넌트들은 기본 게이트웨이를 가진 네트워크 인터페이스에서 사용 가능한 IP를 자동으로 찾아 **광고(advertising) 또는 수신(listening)**에 사용한다.
+#### 이 IP는 ip route show 명령어로 확인 가능하며, "default via"로 시작하는 라인을 찾으면 된다.
+```
+ip route show
+```
+#### ![image](https://github.com/user-attachments/assets/a6f86875-33ec-478d-ab96-558329ad316e)
+#### <br/>
+
+### 왜 Kubernetes에서 글로벌 유니캐스트 IP를 선호할까?
+- 클러스터의 컴포넌트들이 서로 통신해야 하므로, 외부나 다른 노드에서도 접근 가능한 IP여야 한다.
+- 로컬에서만 동작하는 127.0.0.1이나 사설 IP만 사용할 경우 통신 장애가 발생할 수 있음.
+- 단, 보안상 이유로 외부에 직접 노출되면 방화벽 등 보안 설정 필요.
+### 글로벌 유니캐스트 IP에 대한 자세한 내용을 아래 링크를 확인하자.
+#### https://github.com/Shin-jongwhan/network/tree/main/public_IP_and_global_unicast_IP
 ### <br/>
 
