@@ -101,3 +101,85 @@
 ##### 아래 이미지 출처를 모르겠다.
 #### ![image](https://github.com/user-attachments/assets/3dd07955-02cb-48f8-a7bb-884604840925)
 
+### <br/><br/><br/>
+
+## container runtime 
+#### https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker
+### Dockershim 은 kubernetes v1.24 이상에서부터(확인해보니 2020년 근처) 지원하는 container runtime에서 제거되었다.
+#### ![image](https://github.com/user-attachments/assets/ac487d07-54d4-436f-be2c-c5ac710a0687)
+### <br/>
+
+### 위 페이지에 가면 각 container runtime에 대한 설정 방법이 안내되어 있다.
+- containerd
+- CRI-O
+- Docker Engine (cri-dockerd를 설치하여 사용)
+- Mirantis Container Runtime
+### <br/><br/>
+
+## 질문
+### 질문 : 나는 container image가 docker hub에 올라가 있고, 여기서 image를 관리하고 있다. 그러면 나는 docker와 연동할 수 있는 방법을 찾는게 맞는 것인가?
+### 그렇다.
+### <br/>
+
+---
+
+### 질문 : 그러면 여기서 다시 이런 생각이 드는데, 다른 container runtime을 사용하는 사람들은 container image를 어떻게 관리하고 있는 것인가?
+### containerd나 CRI-O를 사용하는 사람들은 Docker 없이도 컨테이너 이미지를 잘 관리하고 있다. 
+#### Docker가 없어도 container image는 OCI(Open Container Initiative) 표준이기 때문에, containerd, CRI-O도 Docker Hub에 있는 이미지 pull/push/관리 전부 가능하다.
+#### <br/>
+
+### containerd 사용자들의 이미지 관리 방식
+#### * 아래 테이블에는 없는데 내가 분석에서 사용했었던 singularity 도 이미지 빌드 도구 중 하나이다.
+| 작업            | 대체 도구                                  | 설명                           |
+| ------------- | -------------------------------------- | ---------------------------- |
+| 이미지 빌드        | `nerdctl`, `buildkit`, `img`, `podman` | Docker 없이도 이미지 생성 가능         |
+| 이미지 push/pull | `nerdctl push`, `ctr images pull` 등    | Docker Hub나 프라이빗 레지스트리 사용 가능 |
+| 로컬 실행         | `nerdctl run`, `ctr run`               | Docker 없이도 컨테이너 실행 가능        |
+
+#### <br/>
+
+###  도구 설명
+- nerdctl: Docker CLI와 거의 1:1로 호환되는 containerd용 CLI (가장 인기 있음)
+- ctr: containerd 기본 CLI → 기능은 많지만 불편하고 저수준
+- buildkit: 고성능 이미지 빌드 엔진 (Docker도 내부에서 사용 중)
+- img: rootless 빌드를 위한 도구
+- oras: OCI 레지스트리 연동을 위한 도구
+### <br/>
+
+### Docker 없이도 이렇게 사용 가능하다.
+```
+# 이미지 빌드 (Dockerfile 사용 가능)
+nerdctl build -t myimage:latest .
+
+# Docker Hub에 push
+nerdctl login
+nerdctl push myimage:latest
+
+# 실행
+nerdctl run -d --name web nginx
+
+```
+#### <br/>
+
+### CRI-O 사용자들의 이미지 관리 방식
+#### CRI-O는 기본적으로 이미지를 직접 빌드하지 않음 (이미지 실행 전용 런타임)
+#### → 빌드/관리에는 Podman을 주로 사용함
+| 작업   | 도구             | 설명                        |
+| ---- | -------------- | ------------------------- |
+| 빌드   | `podman build` | Dockerfile 빌드 가능          |
+| push | `podman push`  | Docker Hub 등으로 업로드 가능     |
+| 실행   | `podman run`   | rootless/secure한 실행 환경 지원 |
+
+#### <br/>
+
+### podman 특징
+- Docker CLI와 거의 호환
+- rootless로도 작동 가능 (보안 측면 우수)
+- Red Hat, Fedora 계열에서 기본 채택 중
+### <br/>
+
+---
+
+### 질문 : docker를 사용하고 있다면 docker + cri-dockerd를 사용하는 게 적절한가?
+### 그렇다.
+### <br/>
