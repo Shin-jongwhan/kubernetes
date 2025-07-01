@@ -190,9 +190,9 @@ sudo systemctl restart kubelet
 ### 여기서는 이걸 할 거임
 - Install a single control-plane Kubernetes cluster
 - Install a Pod network on the cluster so that your Pods can talk to each other
-### <br/>
+### <br/><br/>
 
-### kubeadm의 네트워크 인식 방법
+## kubeadm의 네트워크 인식 방법
 #### kubeadm과 다른 Kubernetes 컴포넌트들은 기본 게이트웨이를 가진 네트워크 인터페이스에서 사용 가능한 IP를 자동으로 찾아 **광고(advertising) 또는 수신(listening)**에 사용한다.
 #### 이 IP는 ip route show 명령어로 확인 가능하며, "default via"로 시작하는 라인을 찾으면 된다.
 ```
@@ -206,6 +206,21 @@ ip route show
 - 로컬에서만 동작하는 127.0.0.1이나 사설 IP만 사용할 경우 통신 장애가 발생할 수 있음.
 - 단, 보안상 이유로 외부에 직접 노출되면 방화벽 등 보안 설정 필요.
 ### 글로벌 유니캐스트 IP에 대한 자세한 내용을 아래 링크를 확인하자.
-#### https://github.com/Shin-jongwhan/network/tree/main/public_IP_and_global_unicast_IP
+#### [public_IP_and_global_unicast_IP](https://github.com/Shin-jongwhan/network/tree/main/public_IP_and_global_unicast_IP)
+### <br/>
+
+### X.509 certificate
+#### Kubernetes 클러스터에서는 직접 만든 적이 없어도 kubeadm이 자동으로 X.509 인증서를 생성해서 사용한다.
+#### Kubernetes의 보안 통신(예: kubelet ↔ API 서버, kubectl ↔ API 서버)은 모두 TLS를 기반으로 하고, 이때 X.509 인증서가 필수적으로 사용된다.
+#### * HTTPS에 사용되는 인증서도 X.509 인증서임
+### <br/>
+
+### 전반적인 내용 요약
+| 항목                                                | 설명                                          |
+| ------------------------------------------------- | ------------------------------------------- |
+| **기본 게이트웨이가 존재해야 함**                              | `ip route show` 명령에서 `"default via"`가 있어야 함 |
+| **기본 게이트웨이에 연결된 네트워크 인터페이스에 글로벌 유니캐스트 IP가 있어야 함** | 이 IP를 자동으로 Kubernetes가 감지해서 사용함             |
+| **IP 자동 감지를 선호함**                                 | 모든 컴포넌트에 직접 IP를 주는 방식은 권장하지 않음              |
+| **IP가 바뀌면 인증서 갱신 필요**                             | 제어 플레인 노드 IP가 변경되면 X.509 인증서 재생성 필요         |
 ### <br/>
 
