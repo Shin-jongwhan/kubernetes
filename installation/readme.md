@@ -203,6 +203,8 @@ ip route show
 #### <br/>
 
 ### 왜 Kubernetes에서 글로벌 유니캐스트 IP를 선호할까?
+### ❗ 중요 : 일반적으로 글로벌 유니캐스트 IP는 외부와 통신 가능한 IP로 공인 IP를 말하는데, 내부망으로 구성할 수 있는 거면 private IP를 사용한다. 
+### 어쨋든 !! 가장 중요한 건 통신만 가능하면 된다는 거다.
 - 클러스터의 컴포넌트들이 서로 통신해야 하므로, 외부나 다른 노드에서도 접근 가능한 IP여야 한다.
 - 로컬에서만 동작하는 127.0.0.1이나 사설 IP만 사용할 경우 통신 장애가 발생할 수 있음.
 - 단, 보안상 이유로 외부에 직접 노출되면 방화벽 등 보안 설정 필요.
@@ -283,6 +285,19 @@ vi /etc/fstab
 ### [add_user_docker_group.yml](https://github.com/Shin-jongwhan/IaC_infrastructure_as_code/blob/main/ansible/playbook/disable_swap_memory.yml)
 ### <br/><br/>
 
+## container runtime 구성
+### 나는 docker를 사용하고 있기 때문에 적절한 runtime을 구성해야 한다.
+### Dockershim 은 kubernetes v1.24 이상부터 제거되었기 때문에 docker + cri-dockerd 로 구성하고자 한다. 자세한 내용은 아래 참고.
+#### container runtime은 생각보다 내용이 훨씬 방대하다. 여러가지를 고려해보고 docker가 아닌 다른 걸로 옮길까 고민했는데, 나는 docker를 사용해도 무방하다는 결론을 내렸다. 
+#### 보안적인 문제는 결국 어느 것에서든 똑같이 일어나고, container image 관리, 권한 관리는 별도로 운영하여 security 관련 compliance를 달성하는 게 맞다고 본다.
+#### https://github.com/Shin-jongwhan/kubernetes/tree/main/container_runtime
+### 공식 문서도 참고하자.
+#### https://kubernetes.io/docs/setup/production-environment/container-runtimes/
+### <br/>
+
+### 작성중
+
+
 ## kubeadm config
 ### 컨트롤 플레인을 띄우기 위한 작업이다.
 ### init config 파일 생성
@@ -300,7 +315,7 @@ localAPIEndpoint:
   advertiseAddress: [IP]
   bindPort: 6443
 nodeRegistration:
-  criSocket: unix:///var/run/dockershim.sock
+  criSocket: ---
   imagePullPolicy: IfNotPresent
   imagePullSerial: true
   name: [hostname]
