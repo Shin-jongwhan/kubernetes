@@ -27,6 +27,36 @@
 | 어떤 걸 설치해야 해? | Calico, Flannel, Cilium 중 하나 선택 (보통 Calico 많이 씀) |
 ### <br/><br/>
 
+## CoreDNS
+### 클러스터 내 Pod들이 "서비스 이름"으로 서로를 찾을 수 있게 해주는 DNS 서버
+### 예시
+```
+curl http://my-service.default.svc.cluster.local
+```
+#### 이 DNS 요청을 해석하는 것이 바로 CoreDNS
+#### 서비스가 생성되면 DNS 레코드가 자동으로 CoreDNS에 등록됨
+#### CoreDNS는 kube-system 네임스페이스에서 kubeadm init 시 자동으로 배포된다.
+### <br/>
+
+### CoreDNS가 필요한 이유
+- 내부 서비스 이름으로 통신: svc-name.namespace.svc.cluster.local
+- Pod → Service 탐색을 DNS로 처리
+- DNS가 없으면 Pod는 클러스터 내 서비스 이름을 절대 알 수 없음
+### <br/>
+
+### 통신 구조
+- CoreDNS = DNS 서비스
+- CNI = IP 배정 + 통신 라우팅
+```
+[Pod A] <---> [Pod B]
+   ↑            ↑
+ [CNI] handles all routing, IPs
+
+[Pod] --> [Service DNS Name] --> [CoreDNS] --> [Real ClusterIP]
+```
+### <br/><br/>
+
+
 ## 대표적인 CNI 플러그인 종류
 ### 1. **Calico**
 
