@@ -370,6 +370,8 @@ sudo systemctl status cri-docker.service
 kubeadm config print init-defaults > kubeadm-init.yaml
 cp kubeadm-init.yaml kubeadm.yaml
 ```
+### 아래와 같이 생성된다.
+#### [kubeadm-init_1.33.0.yaml](https://github.com/Shin-jongwhan/kubernetes/blob/main/installation/kubeadm/kubeadm-init_1.33.0.yaml)
 ### <br/>
 
 ### 아래를 수정해준다.
