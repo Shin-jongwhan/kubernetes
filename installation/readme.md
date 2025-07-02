@@ -445,6 +445,7 @@ kubectl get pods -n kube-system
 
 ## CNI (Container Network Interface)
 ### CNI에 대해서는 아래를 참고하자. 나는 여기서 calico를 사용해볼 것이다.
+### CNI를 구성해야 pod 간 통신, 인식이 가능해진다.
 #### https://github.com/Shin-jongwhan/kubernetes/tree/main/CNI
 ### 아래 보면 coredns 두 개가 Pending 상태이다. 
 #### ![image](https://github.com/user-attachments/assets/7400abda-7171-4648-afb7-4a95b0069922)
