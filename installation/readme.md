@@ -431,6 +431,41 @@ sudo kubeadm init --config kubeadm.yaml
 #### ![image](https://github.com/user-attachments/assets/5e438386-02de-4171-b001-3cc8f0dcee0f)
 #### <br/>
 
-### 서비스 내려간 거 확인
-#### ![image](https://github.com/user-attachments/assets/e708c19d-4f32-44be-92e9-efa3bcd03c40)
+### cubectl로 kube-system 확인
+```
+# 없으면 만들기
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+# kube-system 확인
+kubectl get pods -n kube-system
+```
+### <br/><br/>
+
+## CNI (Container Network Interface)
+### CNI에 대해서는 아래를 참고하자. 나는 여기서 calico를 사용해볼 것이다.
+#### https://github.com/Shin-jongwhan/kubernetes/tree/main/CNI
+### 아래 보면 coredns 두 개가 Pending 상태이다. 
+#### ![image](https://github.com/user-attachments/assets/7400abda-7171-4648-afb7-4a95b0069922)
 ### <br/>
+
+### calico 설치
+```
+kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/calico.yaml
+```
+### <br/>
+
+### 설치 후 다시 확인해보면 이렇게 바뀐다. 
+```
+kubectl get pods -n kube-system
+```
+#### ![image](https://github.com/user-attachments/assets/a80dc382-4ec7-4de2-975a-cf5b396cb450)
+#### ![image](https://github.com/user-attachments/assets/0925a6d8-1d9b-43e8-a2be-0d7600094a50)
+#### <br/>
+
+### 최종적으로 Running이 되는 걸 확인한다.
+#### ![image](https://github.com/user-attachments/assets/91b23a58-1df1-4164-b2cf-eae4abd4d348)
+### <br/><br/>
+
+
