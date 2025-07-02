@@ -295,7 +295,18 @@ vi /etc/fstab
 #### https://kubernetes.io/docs/setup/production-environment/container-runtimes/
 ### <br/>
 
-### 작성중
+### cri-dockerd 설치
+```
+target_dir="/data/software"
+sudo apt-get update
+sudo apt-get install -y git golang-go make
+cd $target_dir && git clone https://github.com/Mirantis/cri-dockerd.git
+cd $target_dir/cri-dockerd && make cri-dockerd
+cp $target_dir/cri-dockerd/cri-dockerd /usr/local/bin/cri-dockerd
+chmod +x /usr/local/bin/cri-dockerd
+```
+### <br/>
+
 
 
 ## kubeadm config
