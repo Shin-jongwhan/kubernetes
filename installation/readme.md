@@ -400,7 +400,7 @@ etcd:
 ### kubeadm init 
 #### Kubernetes 클러스터의 첫 번째 마스터(컨트롤 플레인) 노드를 초기화하는 명령어이다.
 ```
-kubeadm init --config init-config.yaml
+sudo kubeadm init --config kubeadm.yaml
 ```
 #### <br/>
 
@@ -420,3 +420,17 @@ kubeadm init --config init-config.yaml
 ```
 sudo kubeadm token create --print-join-command
 ```
+### <br>
+
+### 만약 config가 수정이 되서 다시 실행하고자 한다면 아래 명령어로 종료시킨다. 
+```
+sudo kubeadm reset -f --cri-socket unix:///var/run/cri-dockerd.sock
+# 그리고 config 수정 완료되면 다시 시작
+sudo kubeadm init --config kubeadm.yaml
+```
+#### ![image](https://github.com/user-attachments/assets/5e438386-02de-4171-b001-3cc8f0dcee0f)
+#### <br/>
+
+### 서비스 내려간 거 확인
+#### ![image](https://github.com/user-attachments/assets/e708c19d-4f32-44be-92e9-efa3bcd03c40)
+### <br/>
