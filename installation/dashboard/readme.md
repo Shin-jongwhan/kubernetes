@@ -68,3 +68,44 @@ NOTE: In case port-forward command does not work, make sure that kong service na
 Dashboard will be available at:
   https://localhost:8443
 ```
+### <br/>
+
+### 위 로그에 나와 있지만, 아래 명령어를 사용하면 웹으로 확인할 수 있게 포트포워딩하여 만들어준다.
+```
+kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
+```
+### <br/>
+
+### kubectl port-forward는 내부적으로 **socat**이라는 유틸리티를 사용해 포트를 연결한다. 
+### 만약 로컬 머신에 설치되어 있지 않으면 포워딩이 실패하기 때문에 설치해준다.
+```
+sudo apt update
+sudo apt install socat
+```
+### <br/>
+
+### 그러면 https://localhost:8443에서 확인할 수 있다.
+### 또는 curl로 확인한다.
+```
+curl -k https://localhost:8443
+```
+#### ![image](https://github.com/user-attachments/assets/51c5ed9c-7dbb-4d6f-bf48-00096eb8dbaa)
+### <br/>
+
+### 알아둘점, NodePort 포트 (Service nodePort)
+### kubernetes는 외부와 통신 가능한 포트 range는 다음과 같다.
+- 기본 범위: 30000–32767
+### 만약 해당 포트들이 안 열려있으면 같은 대역 IP가 아니면 외부에서 접속이 불가능할 것이다.
+#### <br/>
+
+### 외부에 접속 가능하게 설정
+- type: ClusterIP → NodePort로 변경
+```
+kubectl patch svc kubernetes-dashboard-kong-proxy \
+  -n kubernetes-dashboard \
+  -p '{"spec": {"type": "NodePort"}}'
+```
+### <br/>
+
+### 접속 확인
+#### ![image](https://github.com/user-attachments/assets/4ad2e4ae-fea9-44ea-9da6-492858d06b2a)
