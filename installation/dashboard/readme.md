@@ -150,3 +150,12 @@ kubectl -n kubernetes-dashboard create token admin-user
 - 보통은 external-ip로 접속을 시도한다.
 - 만약 external-ip로 접속이 안 되면 internal-ip로 접속하면 되는데, 이 경우 외부에서는 접속이 안 되므로 NAT 설정이 되어 있어야 한다.
 - 사용하는 모든 node의 port (ex) 여기서는 30163)는 개방되어야 한다.
+- 아래 명령어를 실행하는 곳의 서버에서만 포트를 개방하면 접속할 수 있다. 이건 테스트 명령어이고 kubernetes에서 서비스화를 한 건 아니다.
+  ```
+  kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
+  ```
+- 서비스화 해서 프록시를 하려면 nginx가 추가적으로 필요하다. 그런데 이 경우도 모든 node에서 포트 개방이 필요하다.<br/>
+  하지만 알아두어야 할 건, 서비스화 한다는 건 node를 지정할 수 있다는 거고, 해당 node에만 포트를 개방하면 된다는 거다. 즉, 모든 node에서 포트 개방이 필요 없다.
+### <br/>
+
+### 그럼 이제 다음 단계는 nginx 설정이다.
