@@ -48,3 +48,13 @@ kubectl describe node [node_name] | grep Taint
 kubectl taint nodes tgf-service node-role.kubernetes.io/control-plane-
 ```
 #### ![image](https://github.com/user-attachments/assets/7834e2b9-9593-4f08-a616-d5b957e1b643)
+### <br>
+
+### 그럼 이제 마스터 노드에서 따로 join 할 필요가 있을까?
+### 아니다. 마스터 노드는 이미 클러스터에 속해 있으므로 kubeadm join을 다시 할 필요 없다.
+#### <br/>
+
+### 왜 그럴까?
+- kubeadm init은 이미 그 노드를 컨트롤 플레인 노드 + 워커 노드 둘 다의 기능을 할 수 있도록 구성한다.
+- 단지 taint 때문에 일반 워크로드(Pod)가 올라가지 못했던 것뿐이다.
+- taint를 제거한 순간, 이 노드는 워커 역할도 가능한 상태가 된다.
