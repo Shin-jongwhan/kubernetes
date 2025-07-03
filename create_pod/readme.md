@@ -4,6 +4,8 @@
 
 ### 아래와 같이 pod yaml을 하나 테스트로 구성하였다.
 ### 참고로 나는 label에 먼저 role=service 라고 하나 생성해두었고, 해당 label에 맞는 node에만 pod가 생성된다.
+### 아래를 참고하자.
+#### https://github.com/Shin-jongwhan/kubernetes/tree/main/node_label
 #### jhshin-test-pod.yaml
 ```
 # jhshin-test-pod.yaml
