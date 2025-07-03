@@ -100,14 +100,29 @@ curl -k https://localhost:8443
 
 ### 외부에 접속 가능하게 설정
 - type: ClusterIP → NodePort로 변경
+- nodePort: 30163으로 고정
 ```
 kubectl patch svc kubernetes-dashboard-kong-proxy \
   -n kubernetes-dashboard \
-  -p '{"spec": {"type": "NodePort"}}'
+  -p '{
+    "spec": {
+      "type": "NodePort",
+      "ports": [{
+        "port": 443,
+        "targetPort": 443,
+        "protocol": "TCP",
+        "nodePort": 30163
+      }]
+    }
+  }'
 ```
 ### <br/>
 
 ### 접속 확인
+#### 여기서 ip는 
+```
+https://[ip]:30163
+```
 #### ![image](https://github.com/user-attachments/assets/11634efd-adb5-449d-bbe3-0c820a5bd954)
 ### <br/>
 
@@ -129,3 +144,9 @@ kubectl -n kubernetes-dashboard create token admin-user
 
 ### 대시보드에 접속하면 이렇게 보인다.
 #### ![image](https://github.com/user-attachments/assets/1f57949c-1845-4322-a179-777189f3dd67)
+### <br/>
+
+### 여기서 node 접속에 대해 몇 가지 주의 사항이 있다.
+- 보통은 external-ip로 접속을 시도한다.
+- 만약 external-ip로 접속이 안 되면 internal-ip로 접속하면 되는데, 이 경우 외부에서는 접속이 안 되므로 NAT 설정이 되어 있어야 한다.
+- 사용하는 모든 node의 port (ex) 여기서는 30163)는 개방되어야 한다.
