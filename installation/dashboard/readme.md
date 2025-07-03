@@ -108,4 +108,24 @@ kubectl patch svc kubernetes-dashboard-kong-proxy \
 ### <br/>
 
 ### 접속 확인
-#### ![image](https://github.com/user-attachments/assets/4ad2e4ae-fea9-44ea-9da6-492858d06b2a)
+#### ![image](https://github.com/user-attachments/assets/11634efd-adb5-449d-bbe3-0c820a5bd954)
+### <br/>
+
+### bearer token 발급을 해야 접속할 수 있다.
+```
+# admin-user 생성
+kubectl create serviceaccount admin-user -n kubernetes-dashboard
+
+# ClusterRoleBinding 생성
+# 이 권한을 주면 Dashboard에서 전체 클러스터를 볼 수 있다. (테스트/관리용 권한)
+kubectl create clusterrolebinding admin-user-binding \
+  --clusterrole=cluster-admin \
+  --serviceaccount=kubernetes-dashboard:admin-user
+
+# Bearer Token 발급
+kubectl -n kubernetes-dashboard create token admin-user
+```
+### <br/>
+
+### 대시보드에 접속하면 이렇게 보인다.
+#### ![image](https://github.com/user-attachments/assets/1f57949c-1845-4322-a179-777189f3dd67)
