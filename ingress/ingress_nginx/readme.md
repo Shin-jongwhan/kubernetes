@@ -74,3 +74,23 @@ curl --resolve demo.localdev.me:8080:127.0.0.1 http://demo.localdev.me:8080
 kubectl get svc ingress-nginx-controller -n ingress-nginx
 ```
 #### ![image](https://github.com/user-attachments/assets/adb4e9d0-84e8-4fae-97fd-2a11b5bbaa8f)
+### <br/>
+
+### ingress 목록 확인
+```
+kubectl get ingress
+```
+#### <br/>
+
+#### 그러면 이렇게 나온다.
+```
+NAME             CLASS   HOSTS              ADDRESS   PORTS   AGE
+demo-localhost   nginx   demo.localdev.me             80      17h
+```
+### <br/>
+
+### 삭제하려면 다음과 같이 하면 된다.
+```
+kubectl delete ingress demo-localhost
+```
+
