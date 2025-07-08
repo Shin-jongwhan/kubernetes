@@ -156,6 +156,63 @@ kubectl -n kubernetes-dashboard create token admin-user
   ```
 - 서비스화 해서 프록시를 하려면 nginx가 추가적으로 필요하다. 그런데 이 경우도 모든 node에서 포트 개방이 필요하다.<br/>
   하지만 알아두어야 할 건, 서비스화 한다는 건 node를 지정할 수 있다는 거고, 해당 node에만 포트를 개방하면 된다는 거다. 즉, 모든 node에서 포트 개방이 필요 없다.
+### <br/><br/>
+
+## ingress nginx
+### ingress nginx 세팅은 아래 링크를 참고하자.
+#### https://github.com/Shin-jongwhan/kubernetes/tree/main/ingress/ingress_nginx
 ### <br/>
 
-### 그럼 이제 다음 단계는 nginx 설정이다.
+### TLS secret 설정
+- dashboard-tls : secret tls name. 나중에 이걸 사용해서 등록한다.
+- -n ubernetes-dashboard : pod_name
+- --cert, --key : 도메인 발급 시 받은 cert, key 파일. 미리 다운로드 해놓는다.
+```
+kubectl create secret tls dashboard-tls --cert=/data/cert/ssl/xxx.crt --key=/data/cert/ssl/xxx.key -n kubernetes-dashboard
+```
+### <br/>
+
+### yaml 작성
+#### dashboard-ingress.yaml
+- name: Ingress 리소스의 이름.
+- namespace: 이 리소스가 속한 네임스페이스. kubernetes-dashboard 네임스페이스에 생성됨.
+- nginx.ingress.kubernetes.io/backend-protocol : HTTPS로 통신함을 명시한다.
+- secretName : 여기에 위에서 만든 name이 들어간다.
+- nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+  - 요청 경로를 리라이트하여 백엔드에 전달함.
+  - 예: 클라이언트가 /kubernetes/dashboard/foo로 요청 → 백엔드에는 /foo로 전달됨.
+  - 여기서 정규표현식의 두 번째 캡처 그룹 (/|$)(.\*)에서 $2가 두 번째 (.\*)에 해당.
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dashboard-ingress
+  namespace: kubernetes-dashboard
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: service.example.com
+      http:
+        paths:
+          - path: /kubernetes/dashboard(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: kubernetes-dashboard-kong-proxy
+                port:
+                  number: 443
+  tls:
+    - hosts:
+        - service.example.com
+      secretName: dashboard-tls
+```
+### <br/>
+
+### rewrite가 필요한 이유 
+```
+nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+```
+### 
