@@ -70,3 +70,7 @@ curl --resolve demo.localdev.me:8080:127.0.0.1 http://demo.localdev.me:8080
 
 ### 참고
 #### local service로만 구성하는 경우 external IP는 필요 없다. 만약 클라우드 환경이라면 자동으로 설정이 되니 혼동하지 말자.
+```
+kubectl get svc ingress-nginx-controller -n ingress-nginx
+```
+#### ![image](https://github.com/user-attachments/assets/adb4e9d0-84e8-4fae-97fd-2a11b5bbaa8f)
