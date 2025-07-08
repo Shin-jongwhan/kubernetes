@@ -1,5 +1,9 @@
 ### 241219
 ## Kubernetes ingress
+#### https://kubernetes.io/docs/concepts/services-networking/ingress/
+#### ![image](https://github.com/user-attachments/assets/eafd787a-eee4-40f4-9b17-1263b10c94a5)
+### <br/>
+
 ### 프록시 서버 + 로드 밸런싱
 ### 직접 연결되는 pod (Nginx Ingress Controller Pod)로는 nginx가 있다(다른 거 써도 됨). 
 ### 이 pod는 service로 트래픽을 분배한다. 그리고 service는 쿠버네티스가 로드 밸런싱한다.
