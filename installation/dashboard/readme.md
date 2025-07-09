@@ -173,6 +173,7 @@ kubectl create secret tls dashboard-tls --cert=/data/cert/ssl/xxx.crt --key=/dat
 ### <br/>
 
 ### yaml 작성
+### 아래는 https://service.example.com/kubernetes/dashboard 로 접속이 가능하게 하는 설정이다.
 #### dashboard-ingress.yaml
 - name: Ingress 리소스의 이름.
 - namespace: 이 리소스가 속한 네임스페이스. kubernetes-dashboard 네임스페이스에 생성됨.
@@ -212,7 +213,88 @@ spec:
 ### <br/>
 
 ### rewrite가 필요한 이유 
+### 아래 yaml에 있는 항목에 대해 좀 더 알아보자.
 ```
 nginx.ingress.kubernetes.io/rewrite-target: "/$2"
 ```
-### 
+#### <br/>
+
+### 접속할 때는 이렇게 접속할 것이다.
+### 그런데 backend에서는 실제로 kubernetes/dashboard/foo 라는 주소는 없고, /foo 라는 주소만이 있다.
+### 따라서 kubernetes/dashboard/foo -> /foo로 변경해주어야 한다. rewrite가 이 기능을 담당한다.
+```
+https://service.example.com/kubernetes/dashboard/foo
+```
+### <br/>
+
+### 모든 설정이 완료되었다. 이제 해당 yaml을 apply 한다.
+```
+kubectl apply -f dashboard-ingress.yaml
+```
+### <br/>
+
+### 등록 확인
+### 아래와 같이 입력하면 확인은 가능한데 요약 정보만 나타난다. 
+```
+kubectl -n kubernetes-dashboard get ingress
+```
+#### <br/>
+
+#### 출력 예시
+```
+NAME                CLASS   HOSTS                         ADDRESS   PORTS     AGE
+dashboard-ingress   nginx   service.example.com             80, 443   17h
+```
+### <br/>
+
+### 상세 정보 확인
+### ingress에 대한 상세한 정보를 확인하려면 아래와 같이 확인한다.
+```
+kubectl -n kubernetes-dashboard describe ingress dashboard-ingress
+```
+#### <br/>
+
+#### 출력 예시
+```
+Name:             dashboard-ingress
+Labels:           <none>
+Namespace:        kubernetes-dashboard
+Address:
+Ingress Class:    nginx
+Default backend:  <default>
+TLS:
+  dashboard-tls terminates service.example.com
+Rules:
+  Host                         Path  Backends
+  ----                         ----  --------
+  service.example.com
+                               /kubernetes/dashboard(/|$)(.*)   kubernetes-dashboard-kong-proxy:443 (xxx.xxx.xxx.xxx:8443)
+Annotations:                   nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+                               nginx.ingress.kubernetes.io/rewrite-target: /$2
+Events:                        <none>
+```
+### <br/>
+
+### 이제 도메인 주소로 접속해보자. 
+#### ![image](https://github.com/user-attachments/assets/b705bd4d-63f3-4e67-9aef-f248a1b5b161)
+### <br/><br/>
+
+
+## troubleshooting - 도메인 주소를 못 찾는 경우
+### 도메인 인식이 안 되는 경우가 있을 것이다.
+### 이때는 도메인 주소에 A record가 등록이 되었는지 확인해야 한다. 그래야 DNS 서버에서 해당 IP 주소로 찾아서 전파할 수 있다.
+### <br/>
+
+### 먼저 local에서 ping을 찍어보자.
+#### 그러면 ping 출력에 local ip가 제대로 찍혀서 나온다.
+```
+ping service.example.com
+```
+### <br/>
+
+### 그리고 다른 내부망 서버에서 똑같이 ping을 찍어보면 다른 ip 주소가 나올 것이다. 이거는 도메인 해석을 잘못했기 때문이다.
+### 도메인 구매 사이트에 가서 A record에 내부망이라면 내부망 ip 주소로 추가하고, service.example.com으로 추가하면 된다.
+#### 다른 내부망 출력 결과
+```
+64 bytes from 8.81.148.146.bc.googleusercontent.com (146.148.81.8): icmp_seq=1 ttl=56 time=176 ms
+```
