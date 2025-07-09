@@ -247,6 +247,14 @@ dashboard-ingress   nginx   service.example.com             80, 443   17h
 ```
 ### <br/>
 
+### 위에서 CLASS가 nginx로 되어 있는데 이건 ingress nginx를 등록한 것이 사용되는 것이다. 
+### 아래에서 NAME이 사용된다.
+```
+kubectl get ingressclass
+```
+#### ![image](https://github.com/user-attachments/assets/51ffb7dd-11a8-4737-af05-795b5bb4d5c4)
+### <br/>
+
 ### 상세 정보 확인
 ### ingress에 대한 상세한 정보를 확인하려면 아래와 같이 확인한다.
 ```
