@@ -89,10 +89,17 @@ demo-localhost   nginx   demo.localdev.me             80      17h
 ```
 ### <br/>
 
-### 삭제하려면 다음과 같이 하면 된다.
+### dashboard에서도 확인 가능
+#### ![image](https://github.com/user-attachments/assets/af3853a2-1e02-49bd-9e68-158374ed21b1)
+### <br/>
+
+### 삭제하려면 다음과 같이 하면 된다(dashboard에서도 삭제 가능).
 ```
 kubectl delete ingress demo-localhost
 kubectl delete deployment demo
 kubectl delete service demo
 ```
+### <br/>
 
+### dashboard에서 확인할 수 있다.
+#### ![image](https://github.com/user-attachments/assets/0e7570c2-2e70-4441-a33f-35c246415c59)
