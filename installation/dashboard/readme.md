@@ -283,6 +283,8 @@ Events:                        <none>
 ## troubleshooting - 도메인 주소를 못 찾는 경우
 ### 도메인 인식이 안 되는 경우가 있을 것이다.
 ### 이때는 도메인 주소에 A record가 등록이 되었는지 확인해야 한다. 그래야 DNS 서버에서 해당 IP 주소로 찾아서 전파할 수 있다.
+### 도메인 설정 관련은 아래 링크를 참고
+#### https://github.com/Shin-jongwhan/network/tree/main/publish_domain_and_ssl_cert#domain-%EA%B5%AC%EC%9E%85-%EB%B0%8F-record-%EC%84%A4%EC%A0%95
 ### <br/>
 
 ### 먼저 local에서 ping을 찍어보자.
