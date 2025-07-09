@@ -41,6 +41,27 @@ helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dash
 ```
 #### <br/>
 
+### 만약 특정 node에만 설치하고자 한다면 label을 붙여야 하는데, 다음을 참고하자.
+#### https://github.com/Shin-jongwhan/kubernetes/tree/main/node_label
+#### https://github.com/Shin-jongwhan/kubernetes/tree/main/create_pod
+#### <br/>
+
+#### dashboard-values.yaml 예시
+#### dashboard: "true" 라는 label이 붙은 곳에만 dashboard pod가 생성될 수 있게 한다.
+```
+nodeSelector:
+  dashboard: "true"
+```
+#### <br/>
+
+#### yaml 명시하여 설치
+```
+helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard \
+  --namespace kubernetes-dashboard --create-namespace \
+  -f dashboard-values.yaml
+```
+### <br/>
+
 ### 설치 로그
 ```
 "kubernetes-dashboard" already exists with the same configuration, skipping
