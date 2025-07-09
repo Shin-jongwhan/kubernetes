@@ -92,5 +92,7 @@ demo-localhost   nginx   demo.localdev.me             80      17h
 ### 삭제하려면 다음과 같이 하면 된다.
 ```
 kubectl delete ingress demo-localhost
+kubectl delete deployment demo
+kubectl delete service demo
 ```
 
