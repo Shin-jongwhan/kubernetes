@@ -29,4 +29,8 @@ kubectl get nodes
 
 ### 다음과 같이 ansible playbook도 만들 수 있다.
 #### https://github.com/Shin-jongwhan/IaC_infrastructure_as_code/blob/main/ansible/playbook/join_kubernetes_worker.yml
+### <br/>
+
+### dashboard에서도 확인 가능하다.
+#### ![image](https://github.com/user-attachments/assets/461f702c-7b63-4b57-9f06-7d41ed585a63)
 
