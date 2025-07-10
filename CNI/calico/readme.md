@@ -147,7 +147,8 @@ natOutgoing: true
 ### <br/>
 
 ### 다음을 바꿔야 한다.
-- natOutgoing: false
+#### * 굳이 새로 생성 안 하고 default 로 있는 ippool에서 바꿔도 된다.
+- natOutgoing: true
 - CIDR은 겹치지 않도록 새 범위로 설정 (예: 192.168.100.0/24). 만약 CIDR block 이 겹치면 에러난다.
 #### non-nat-pool.yaml
 ```yaml
@@ -157,7 +158,7 @@ metadata:
   name: no-nat-pool
 spec:
   cidr: 192.168.100.0/24
-  natOutgoing: false
+  natOutgoing: true
   ipipMode: Always
   vxlanMode: Never
   nodeSelector: all()
