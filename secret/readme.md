@@ -79,3 +79,10 @@ kubectl create secret generic my-docker-secret \
 - `kubectl describe secret <name>` 으로 타입 확인 가능
 - `kubectl get secret <name> -o yaml` 로 base64 인코딩 확인
 - `echo <base64> | base64 -d` 로 실제 값 확인 가능
+### <br/>
+
+### secret 조회
+```
+kubectl get secret dashboard-tls -n tgf-django-dev
+```
+#### ![image](https://github.com/user-attachments/assets/4bbc5cfe-fbe7-43db-8e79-62566e5e96c5)
