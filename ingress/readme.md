@@ -1,4 +1,4 @@
-### 241219
+### 250710
 ## Kubernetes ingress
 #### https://kubernetes.io/docs/concepts/services-networking/ingress/
 #### ![image](https://github.com/user-attachments/assets/eafd787a-eee4-40f4-9b17-1263b10c94a5)
@@ -40,3 +40,17 @@
 
 ### 7. Nginx Ingress Controller -> 클라이언트로 반환.
 #### Nginx Ingress Controller가 응답을 클라이언트로 반환.
+### <br/><br/>
+
+## 재시작
+### 만약 ingress에 변경사항이 있다면 재시작을 해줘야 한다.
+```
+kubectl delete pod -n ingress-nginx -l app.kubernetes.io/name=ingress-nginx
+```
+### <br/>
+
+### 그 다음 ingress가 재시작되었는지 확인한다.
+```
+kubectl get pods -n ingress-nginx -l app.kubernetes.io/name=ingress-nginx -o wide
+```
+#### ![image](https://github.com/user-attachments/assets/a409fb02-e33c-40bb-a26a-441aed48f850)
