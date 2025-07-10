@@ -19,7 +19,7 @@ kubectl create secret generic my-secret \
   --from-literal=password=1234
 ```
 #### 결과 내부:
-```
+```yaml
 data:
   username: YWRtaW4=
   password: MTIzNA==
