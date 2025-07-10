@@ -1,0 +1,13 @@
+# 기존 default calico ippool을 비활성화할 때 사용한다.
+apiVersion: projectcalico.org/v3
+kind: IPPool
+metadata:
+  name: default-ipv4-ippool
+spec:
+  cidr: 192.168.0.0/16
+  natOutgoing: true
+  ipipMode: Never
+  vxlanMode: Never
+  nodeSelector: all()
+  disabled: false
+
