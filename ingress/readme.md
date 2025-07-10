@@ -44,6 +44,7 @@
 
 ## 재시작
 ### 만약 ingress에 변경사항이 있다면 재시작을 해줘야 한다.
+#### * 참고로 특정 namespace의 ingress에서 yaml을 변경하여 다시 적용하는 거면 그냥 kubectl apply 하면 자동으로 변경 사항이 적용된다.
 ```
 kubectl delete pod -n ingress-nginx -l app.kubernetes.io/name=ingress-nginx
 ```
