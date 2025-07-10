@@ -28,13 +28,13 @@ type: Opaque
 #### <br/>
 
 #### ✅ 2. kubernetes.io/tls
-```
+```bash
 kubectl create secret tls my-tls-secret \
   --cert=path/to/tls.crt \
   --key=path/to/tls.key
 ```
 #### 결과 내부:
-```
+```yaml
 data:
   tls.crt: (base64 인코딩된 인증서)
   tls.key: (base64 인코딩된 개인키)
@@ -43,7 +43,7 @@ type: kubernetes.io/tls
 #### <br/>
 
 #### ✅ 3. kubernetes.io/basic-auth
-```
+```bash
 kubectl create secret generic my-basic-auth \
   --type=kubernetes.io/basic-auth \
   --from-literal=username=myuser \
@@ -52,7 +52,7 @@ kubectl create secret generic my-basic-auth \
 #### <br/>
 
 #### ✅ 4. kubernetes.io/ssh-auth
-```
+```bash
 kubectl create secret generic my-ssh-key \
   --type=kubernetes.io/ssh-auth \
   --from-file=ssh-privatekey=~/.ssh/id_rsa
@@ -60,7 +60,7 @@ kubectl create secret generic my-ssh-key \
 #### <br/>
 
 #### ✅ 5. kubernetes.io/dockerconfigjson (imagePullSecret용)
-```
+```bash
 kubectl create secret docker-registry my-registry-secret \
   --docker-username=myuser \
   --docker-password=mypass \
@@ -68,8 +68,14 @@ kubectl create secret docker-registry my-registry-secret \
   --docker-server=https://index.docker.io/v1/
 ```
 #### 또는 파일 기반:
-```
+```bash
 kubectl create secret generic my-docker-secret \
   --type=kubernetes.io/dockerconfigjson \
   --from-file=.dockerconfigjson=$HOME/.docker/config.json
 ```
+### <br/>
+
+### 참고
+- `kubectl describe secret <name>` 으로 타입 확인 가능
+- `kubectl get secret <name> -o yaml` 로 base64 인코딩 확인
+- `echo <base64> | base64 -d` 로 실제 값 확인 가능
