@@ -308,7 +308,6 @@ Events:                        <none>
 #### ![image](https://github.com/user-attachments/assets/b705bd4d-63f3-4e67-9aef-f248a1b5b161)
 ### <br/><br/>
 
-
 ## troubleshooting - 도메인 주소를 못 찾는 경우
 ### 도메인 인식이 안 되는 경우가 있을 것이다.
 ### 이때는 도메인 주소에 A record가 등록이 되었는지 확인해야 한다. 그래야 DNS 서버에서 해당 IP 주소로 찾아서 전파할 수 있다.
@@ -329,3 +328,30 @@ ping service.example.com
 ```
 64 bytes from 8.81.148.146.bc.googleusercontent.com (146.148.81.8): icmp_seq=1 ttl=56 time=176 ms
 ```
+### <br/><br/>
+
+## troubleshooting - pod 등이 안 보일 경우
+### 1. 권한을 체크한다. 대부분 권한 문제이다. 
+### <br/>
+
+### 2. 상단에 namespace를 모든 네임스페이스로 봐야 전체 실행에 대한 걸 볼 수 있다.
+#### <img width="1897" height="900" alt="image" src="https://github.com/user-attachments/assets/b4a428bd-d6a1-44c5-8cc1-2118fac96795" />
+### <br/>
+
+### 3. log를 확인한다.
+```
+kubectl -n kubernetes-dashboard logs deployment/kubernetes-dashboard-api
+```
+### <br/>
+
+### 4. pod가 잘 실행 중인지 확인한다. 만약 running 상태가 아니면 rollout restart를 해본다.
+```
+kubectl -n kubernetes-dashboard get pods
+kubectl -n kubernetes-dashboard rollout restart deployment kubernetes-dashboard-api
+```
+#### <img width="727" height="102" alt="image" src="https://github.com/user-attachments/assets/77096e6b-b03f-4505-9dd4-3ecb21c9276f" />
+### <br/>
+
+
+### <br/><br/>
+
