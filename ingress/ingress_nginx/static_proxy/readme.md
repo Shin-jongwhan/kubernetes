@@ -1,7 +1,5 @@
 ### 250714
 # Static proxy 구성
-### <br/><br/>
-
 ### nginx 기본 주소는 /usr/share/nginx/html이고, 그 하위를 주소로 인식한다. 
 ### 나는 prefix path도 같이 쓸 것이기 때문에 이렇게 지정했다.
 #### <br/>
