@@ -120,3 +120,9 @@ ls -al /usr/share/nginx/html/
 #### <img width="612" height="115" alt="image" src="https://github.com/user-attachments/assets/1a41e4ed-e399-4967-a267-70c0497d52ae" />
 
 ### <br/>
+
+### 그리고 크롬 등 브라우저에 주소로 입력해서 확인해보자.
+```
+https://service.example.com/django/dev/static/css/default.css
+```
+#### <img width="647" height="333" alt="image" src="https://github.com/user-attachments/assets/7f509417-7292-4831-8448-5354d3cd28e3" />
