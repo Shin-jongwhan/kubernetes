@@ -1,4 +1,7 @@
 ### 250715
+# volume 유형 - hostPath, PV (persistance volume), PVC (persistance volume claim)
+### <br/><br/>
+
 ## hostPath
 ### Pod가 노드의 로컬 디렉토리를 직접 마운트해서 사용하는 방식.
 ### 별도의 PV/PVC 없이 Pod 안에서 바로 설정 가능.
