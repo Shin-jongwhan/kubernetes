@@ -1,5 +1,11 @@
 ### 250715
 # volume 유형 - hostPath, PV (persistance volume), PVC (persistance volume claim)
+### 요약하자면 이렇다.
+- emptyDir (pod 안에서만 사용 가능한  volume)는 temporary storage 이다.
+- hostPath 는 persistance volume이지만 node dependent 하다.
+- 모든 node 에 같이 사용하려면 network storage 를 사용해야 한다(ceph, S3 등).
+#### <img width="455" height="582" alt="image" src="https://github.com/user-attachments/assets/abc7b317-fe8a-46b1-9535-8974cd75b0cb" />
+
 ### <br/><br/>
 
 ## hostPath
