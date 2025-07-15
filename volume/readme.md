@@ -1,10 +1,6 @@
 ### 250715
 # Volume
-### 참고
-#### [Kubernetes CSI 개념 정리 및 실습](https://tech.gluesys.com/blog/2022/06/21/CSI.html#fn:7)
-#### [kubernetes docs - persistance volume](https://kubernetes.io/ko/docs/concepts/storage/persistent-volumes/)
-#### [kubernetes docs - volume](https://kubernetes.io/ko/docs/concepts/storage/volumes/)
-#### https://github.com/Shin-jongwhan/network/tree/main/iSCSI_VS_NFS
+#### docs : 컨테이너 내의 디스크에 있는 파일은 임시적이며, 컨테이너에서 실행될 때 애플리케이션에 적지 않은 몇 가지 문제가 발생한다. 한 가지 문제는 컨테이너가 크래시될 때 파일이 손실된다는 것이다. kubelet은 컨테이너를 다시 시작하지만 초기화된 상태이다. 두 번째 문제는 Pod에서 같이 실행되는 컨테이너간에 파일을 공유할 때 발생한다. 쿠버네티스 볼륨 추상화는 이러한 문제를 모두 해결한다. 파드에 대해 익숙해지는 것을 추천한다.
 ### <br/><br/>
 
 ## Volume 유형
@@ -20,7 +16,7 @@
 | ---------------------- | ----------------------------------- |
 | `emptyDir`             | 파드가 생성될 때 생성되고 파드가 삭제될 때 삭제되는 임시 볼륨 |
 | `hostPath`             | 노드의 로컬 볼륨                           |
-| `awsElasticBlockStore` | 아마존 웹 서비스 EBS 볼륨                    |
+| `awsElasticBlockStore` | 아마존 웹 서비스 EBS 볼륨 (**v1.17 부터 deprecated**)              |
 | `azureDisk`            | 마이크로소프트 애저 볼륨                       |
 | `cephfs`               | Ceph4 분산 파일 시스템 볼륨                  |
 | `cinder`               | 오픈스택 Cinder 블록 스토리지 볼륨              |
@@ -83,4 +79,10 @@
 | 사용    | Pod에서 PVC를 볼륨으로 마운트하여 사용하는 단계.                  |
 | 회수    | PVC 삭제 이후 PV를 어떻게 처리할지 결정하는 단계. Retain/Delete 등 |
 
-### <br/> 
+### <br/><br/> 
+
+## 참고
+#### [Kubernetes CSI 개념 정리 및 실습](https://tech.gluesys.com/blog/2022/06/21/CSI.html#fn:7)
+#### [kubernetes docs - persistance volume](https://kubernetes.io/ko/docs/concepts/storage/persistent-volumes/)
+#### [kubernetes docs - volume](https://kubernetes.io/ko/docs/concepts/storage/volumes/)
+#### https://github.com/Shin-jongwhan/network/tree/main/iSCSI_VS_NFS
