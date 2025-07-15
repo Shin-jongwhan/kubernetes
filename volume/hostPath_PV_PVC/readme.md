@@ -120,10 +120,99 @@ spec:
 ### <br/><br/>
 
 ## EBS는 local storage 인데 어떻게 PV 가 될 수 있나?
+### 중요 참고 : v1.17부터 deprecated 되었고, 참고만 하자.
 ### EBS는 로컬 볼륨이 맞다(물리적으로).
 ### EBS는 특정 AZ(Availability Zone) 에 물리적으로 존재하는 block-level storage 이다.
 ### 특정 EC2 인스턴스에 attach 할 수 있고, 동시에 여러 인스턴스에서 사용할 수는 없다.
 ### 즉, EBS는 “AZ 내 단일 노드 전용 디스크”처럼 동작한다.
 ### <br/>
 
+### 사실상 local disk와 차이가 없다.
+| 항목            | EBS                     | 로컬 디스크 (`hostPath`, `local`) |
+| ------------- | ----------------------- | ---------------------------- |
+| 스토리지 위치       | AWS의 AZ 기반 네트워크 블록 스토리지 | 실제 노드 안의 디스크                 |
+| 여러 노드에서 사용    | ❌ No (ReadWriteOnce)    | ❌ No (해당 노드에서만 사용 가능)        |
+| 이동성           | EC2 간 attach/detach 가능  | 물리적으로 이동 불가                  |
+| 속도            | 빠르지만 네트워크 딜레이 존재        | 매우 빠름 (로컬 I/O)               |
+| ReclaimPolicy | `Retain`, `Delete` 등 가능 | 동일하게 가능                      |
+| 운영 난이도        | AWS가 관리                 | 사용자가 직접 디렉토리 존재 확인/관리 필요     |
+
+### <br/><br/>
+
+## local storage 도 PV 가 될 수 있나?
+### 로컬 스토리지(Local Storage) 도 Kubernetes 에서 PersistentVolume(PV) 로 연결해서 사용할 수 있다.
+### <br/>
+
+### ex yaml) hostPath 방식 (가장 간단)
+#### 📌 주의: hostPath는 노드에 종속되기 때문에 반드시 nodeAffinity로 어떤 노드의 디스크인지 명시해야 함.
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: local-pv-hostpath
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /data/mysql
+  persistentVolumeReclaimPolicy: Retain
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - your-node-name
+```
+### <br/>
+
+### ex yaml) local 볼륨 타입 (정식 로컬 볼륨)
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: local-pv
+spec:
+  capacity:
+    storage: 20Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /mnt/disks/data1
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - your-node-name
+```
+### <br/>
+
+### 주의할 점
+| 항목                    | 설명                                                                    |
+| --------------------- | --------------------------------------------------------------------- |
+| 스토리지는 **고정된 노드**에만 존재 | Pod는 해당 노드에만 스케줄 되어야 함 (`nodeAffinity` or `nodeSelector`)             |
+| 다른 노드로 이동 ❌           | 로컬 디스크는 공유되지 않으므로 다른 노드에서 접근 불가                                       |
+| 볼륨 존재 여부 확인 필요        | `/data/mysql`, `/mnt/disks/data1` 디렉토리가 실제로 존재해야 함                    |
+| 동적 프로비저닝 불가 (기본 상태)   | `hostPath`나 `local`은 동적 생성되지 않음. 필요한 경우 `local-static-provisioner` 사용 |
+
+### <br/>
+
+### 정리
+| 질문                     | 대답                                        |
+| ---------------------- | ----------------------------------------- |
+| 로컬 스토리지도 PV로 연결할 수 있어? | ✅ 가능함 (`hostPath`, `local` 방식)            |
+| 자동 생성돼?                | ❌ 기본적으로는 수동 생성 필요                         |
+| 어떤 노드인지 지정해야 해?        | ✅ 반드시 `nodeAffinity` 또는 `nodeSelector` 필요 |
+| 공유 가능한가?               | ❌ 아님. 해당 노드에서만 접근 가능함                     |
+
+### <br/>
 
