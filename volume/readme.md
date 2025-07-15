@@ -81,6 +81,24 @@
 
 ### <br/><br/> 
 
+## 퍼시스턴트 볼륨의 유형
+#### https://kubernetes.io/ko/docs/concepts/storage/persistent-volumes/#%ED%8D%BC%EC%8B%9C%EC%8A%A4%ED%84%B4%ED%8A%B8-%EB%B3%BC%EB%A5%A8%EC%9D%98-%EC%9C%A0%ED%98%95
+### 퍼시스턴트볼륨 유형은 플러그인으로 구현된다. 쿠버네티스는 현재 다음의 플러그인을 지원한다.
+- cephfs - CephFS 볼륨
+- csi - 컨테이너 스토리지 인터페이스 (CSI)
+- fc - Fibre Channel (FC) 스토리지
+- hostPath - HostPath 볼륨 (단일 노드 테스트 전용. 다중-노드 클러스터에서 작동하지 않음. 대신 로컬 볼륨 사용 고려)
+- iscsi - iSCSI (SCSI over IP) 스토리지
+- local - 노드에 마운트된 로컬 스토리지 디바이스
+- nfs - 네트워크 파일 시스템 (NFS) 스토리지
+- rbd - Rados Block Device (RBD) 볼륨
+### <br/>
+
+### 사용 중단이 꽤 많다. 자세한 건 위 공식 docs 참고
+#### <img width="767" height="495" alt="image" src="https://github.com/user-attachments/assets/fa6a0611-c6e5-4ca3-8cd2-51099325f536" />
+
+### <br/><br/> 
+
 ## 참고
 #### [Kubernetes CSI 개념 정리 및 실습](https://tech.gluesys.com/blog/2022/06/21/CSI.html#fn:7)
 #### [kubernetes docs - persistance volume](https://kubernetes.io/ko/docs/concepts/storage/persistent-volumes/)
