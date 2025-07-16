@@ -5,6 +5,10 @@
 - hostPath 는 persistance volume이지만 node dependent 하다.
 - 모든 node 에 같이 사용하려면 network storage 를 사용해야 한다(ceph, S3 등).
 #### <img width="455" height="582" alt="image" src="https://github.com/user-attachments/assets/abc7b317-fe8a-46b1-9535-8974cd75b0cb" />
+### <br/>
+
+### 적용한 예시는 다음을 참고하자
+#### https://github.com/Shin-jongwhan/kubernetes/tree/main/ingress/ingress_nginx/static_proxy
 
 ### <br/><br/>
 
