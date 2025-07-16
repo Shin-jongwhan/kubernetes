@@ -44,6 +44,8 @@ spec:
 ### <br/>
 
 ### static proxy를 위해 nginx service를 하나 만들어야 한다.
+### hostPath 방법 (테스트 / 개발용)
+#### 운영에서는 PV로 운영한다. PV 방법은 아래에서 추가로 소개한다.
 #### django-static.yaml
 ```
 apiVersion: apps/v1
@@ -126,3 +128,130 @@ ls -al /usr/share/nginx/html/
 https://service.example.com/django/dev/static/css/default.css
 ```
 #### <img width="647" height="333" alt="image" src="https://github.com/user-attachments/assets/7f509417-7292-4831-8448-5354d3cd28e3" />
+
+### <br/><br/>
+
+## PV로 만드는 방법
+### 다음의 3가지가 필요하다.
+- storage class
+- PV (persistance volume) + PVC (persistance volume claim)
+- deployment + service (이건 hostPath와 동일)
+### <br/>
+
+### 먼저 나는 yaml을 이런 형식으로 정리해놓았다.
+```
+storage_class/
+└── storageclass_local.yaml
+
+persistance_volume/
+└── pv_django_dev_static.yaml
+
+deployment/
+└── django/
+    └── django-dev-static.yaml
+```
+### <br/>
+
+### storageclass_local.yaml
+```yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+```
+### <br/>
+
+### pv_django_dev_static.yaml
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-django-static
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadOnlyMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /data/django/dev/collectstatic
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: role
+              operator: In
+              values:
+                - service
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-django-static
+  namespace: web-app
+spec:
+  accessModes:
+    - ReadOnlyMany
+  storageClassName: local-storage
+  resources:
+    requests:
+      storage: 1Gi
+```
+### <br/>
+
+### django-dev-static.yaml
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-static-server
+  namespace: web-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: django-static-server
+  template:
+    metadata:
+      labels:
+        app: django-static-server
+    spec:
+      nodeSelector:
+        role: service
+      containers:
+        - name: nginx
+          image: nginx:stable
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: static-files
+              mountPath: /usr/share/nginx/html/static
+      volumes:
+        - name: static-files
+          persistentVolumeClaim:
+            claimName: pvc-django-static
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: django-static-server
+  namespace: web-app
+spec:
+  selector:
+    app: django-static-server
+  ports:
+    - port: 80
+      targetPort: 80
+```
+### <br/>
+
+### apply 명령어 실행
+```
+kubectl apply -f storage_class/storageclass_local.yaml
+kubectl apply -f persistance_volume/pv_django_dev_static.yaml
+kubectl apply -f deployment/django_static/django-static.yaml
+```
