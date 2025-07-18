@@ -135,3 +135,7 @@ kubectl apply -f grafana-pod.yaml
 
 ### 이제 여기서 dashboard를 커스터마이징할 수 있는데, 아래 페이지를 참고하자. 다른 template들도 많다.
 #### https://grafana.com/solutions/kubernetes/?pg=dashboards&plcmt=featured-dashboard-1
+### <br/>
+
+### connection - data source에 가보자. prometheus 등과 잘 연결이 되었는지 확인해보자.
+#### <img width="1898" height="535" alt="image" src="https://github.com/user-attachments/assets/cec2a4cb-dd5d-47ba-a7a8-265f5b5fd9b9" />
