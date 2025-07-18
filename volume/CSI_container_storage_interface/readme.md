@@ -98,5 +98,7 @@ volumes:
 | ④ PVC 생성          | Pod에서 사용할 스토리지 요청     |
 | ⑤ Pod에 마운트        | PVC를 Pod에 연결하여 사용     |
 
-### <br/>
+### <br/><br/>
 
+## 참고 블로그
+#### https://velog.io/@manarc/Kubernetes-CSI-Longhorn#%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98-%EC%BB%B4%ED%8F%AC%EB%84%8C%ED%8A%B8
