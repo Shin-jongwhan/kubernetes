@@ -215,6 +215,7 @@ sudo apt-mark unhold kubelet kubectl && \
 sudo apt-get update && sudo apt-get install -y kubelet='1.33.x-*' kubectl='1.33.x-*' && \
 sudo apt-mark hold kubelet kubectl
 # 업그레이드
+# kubelet은 에이전트이기 때문에 업그레이드하면 restart 해야 한다.
 sudo systemctl daemon-reload
 sudo systemctl restart kubelet
 
@@ -234,13 +235,6 @@ kubelet --version
 ```
 #### ![image](https://github.com/user-attachments/assets/a1b03211-5339-4673-b4a1-23c9bcc9f624)
 #### <br/>
-
-### kubelet은 에이전트이기 때문에 업그레이드하면 restart 해야 한다(자세한 내용은 위 upgrading-linux-nodes 링크 참고).
-```
-sudo systemctl daemon-reload
-sudo systemctl restart kubelet
-```
-### <br/>
 
 ### 그 다음 step
 - Install a single control-plane Kubernetes cluster
@@ -279,6 +273,14 @@ ip route show
 | **기본 게이트웨이에 연결된 네트워크 인터페이스에 글로벌 유니캐스트 IP가 있어야 함** | 이 IP를 자동으로 Kubernetes가 감지해서 사용함             |
 | **IP 자동 감지를 선호함**                                 | 모든 컴포넌트에 직접 IP를 주는 방식은 권장하지 않음              |
 | **IP가 바뀌면 인증서 갱신 필요**                             | 제어 플레인 노드 IP가 변경되면 X.509 인증서 재생성 필요         |
+#### <br/>
+
+### 위 표에 대한 부가 설명
+- **IP 자동 감지** : CNI와 CoreDNS가 수행한다.
+  - **CNI** : ClusterIP 설정으로 IP 범위 지정, 컴포넌트에 IP 할당한다.
+    - https://github.com/Shin-jongwhan/kubernetes/tree/main/CNI 내용 참고
+  - **CoreDNS** : 서비스 이름이나 파드 이름을 IP로 변환해주는 DNS 서버. DNS 자동 등록하고 Service, Pod 이름을 IP로 자동 변환한다.
+    - https://github.com/Shin-jongwhan/kubernetes/tree/main/coredns 내용 참고
 
 ### <br/>
 
