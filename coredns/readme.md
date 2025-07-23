@@ -1,4 +1,4 @@
-### 250710
+### 250724
 # CoreDNS
 ### pod 간 통신에 꽤 중요하다. 이걸 이해하지 않으면 왜 네트워킹이 안 되는지 파악하기 어려우니 DNS가 뭔지 일단 공부하자. 자세한 내용은 아래 링크 참고.
 #### https://github.com/Shin-jongwhan/network/tree/main/DNS
