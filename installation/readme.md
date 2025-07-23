@@ -22,6 +22,7 @@
 #### 배를 하나 만들고, container를 운영하는 것을 나타내는 것에 대해 비유적으로 아주 잘 설명해준다.
 ### <br/><br/>
 
+----
 ## Download Kubernetes (넘어가기)
 ### [Install kubeadm](https://github.com/Shin-jongwhan/kubernetes/tree/main/installation#install-kubeadm) 에서 한 번에 kubeadm, kubelet, kubectl를 설치할 것이다. 참고만 하기.
 #### https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
@@ -56,6 +57,8 @@ kubectl version --client --output=yaml
 #### ![image](https://github.com/user-attachments/assets/c8baf1ea-28b2-4cd8-a408-c87a93c62a57)
 ### <br/><br/>
 
+----
+
 ## Install tools
 #### https://kubernetes.io/docs/tasks/tools/
 ### 🔍 3가지 도구 비교 요약
@@ -67,6 +70,8 @@ kubectl version --client --output=yaml
 ### <br/>
 
 ### 나는 service, db, backend 서버가 있고 service를 마스터로, db, backend를 worker로 구성할 것이다. 이를 위해 kubeadm을 사용할 것이다.
+#### * control plane node를 동시에 worker node로 구성할 수도 있다. 이를 untainted 라고 한다. 
+#### https://github.com/Shin-jongwhan/kubernetes/tree/main/control_plane_untainted
 ### <br/><br/>
 
 ## install kubeadm
