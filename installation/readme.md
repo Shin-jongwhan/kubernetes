@@ -1,6 +1,16 @@
 ### 250630
 # install kubernetes
-### kubectl을 local에 설치하고 나머지는 container 환경에서 운영하는 것이 좋다고 공식 docs에 나와있다.
+### 설치 대상
+| 구성 요소       | Master 노드 | Worker 노드 |
+| ----------- | --------- | --------- |
+| **kubeadm** | ✅ 설치      | ✅ 설치      |
+| **kubelet** | ✅ 설치      | ✅ 설치      |
+| **kubectl** | ✅ 설치   | ❌ 선택 사항   |
+
+### <br/>
+
+### kube-apiserver, kube-proxy 같은 컴포넌트들은 컨테이너 이미지로 배포할 수 있다.
+### 이러한 각 components들은 container 환경에서 운영하는 것이 좋다고 공식 docs에 나와있다.
 #### https://kubernetes.io/docs/setup/
 #### ![image](https://github.com/user-attachments/assets/075aae93-576d-4b0d-a468-b302f6fc607f)
 ### <br/>
