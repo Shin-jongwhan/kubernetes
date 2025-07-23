@@ -1,0 +1,13 @@
+# natOutgoing: true 외부 접속 허용
+# disabled: true 비활성화. 활성화 시 false로 변경하기.
+apiVersion: projectcalico.org/v3
+kind: IPPool
+metadata:
+  name: no-nat-pool
+spec:
+  cidr: 10.100.0.0/24
+  natOutgoing: true
+  ipipMode: Always
+  vxlanMode: Never
+  nodeSelector: all()
+  disabled: true
