@@ -195,7 +195,37 @@ sudo apt-mark hold kubelet kubeadm kubectl
 ### <br/>
 
 ### 업그레이드가 필요한 경우 아래 참고
+```
+# kubeadm upgrade 준비
+# replace x in 1.33.x-* with the latest patch version
+sudo apt-mark unhold kubeadm && \
+sudo apt-get update && sudo apt-get install -y kubeadm='1.33.x-*' && \
+sudo apt-mark hold kubeadm
+# 업그레이드
+sudo kubeadm upgrade node
+
+# node drain 설정으로 더 이상 node에 작업이 가지 않게 막기.
+# execute this command on a control plane node
+# replace <node-to-drain> with the name of your node you are draining
+kubectl drain <node-to-drain> --ignore-daemonsets
+
+# Upgrade kubelet and kubectl 준비
+# replace x in 1.33.x-* with the latest patch version
+sudo apt-mark unhold kubelet kubectl && \
+sudo apt-get update && sudo apt-get install -y kubelet='1.33.x-*' kubectl='1.33.x-*' && \
+sudo apt-mark hold kubelet kubectl
+# 업그레이드
+sudo systemctl daemon-reload
+sudo systemctl restart kubelet
+
+# uncordon : 다시 node 활성화
+# execute this command on a control plane node
+# replace <node-to-uncordon> with the name of your node
+kubectl uncordon <node-to-uncordon>
+```
 #### https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/upgrading-linux-nodes/
+#### <br/>
+
 ### 버전 확인
 ```
 kubectl version --client
