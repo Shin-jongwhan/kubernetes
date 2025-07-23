@@ -207,7 +207,7 @@ sudo systemctl restart kubelet
 ```
 ### <br/>
 
-### 여기서는 이걸 할 거임
+### 그 다음 step
 - Install a single control-plane Kubernetes cluster
 - Install a Pod network on the cluster so that your Pods can talk to each other
 ### <br/><br/>
