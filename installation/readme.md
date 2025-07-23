@@ -79,6 +79,15 @@ kubectl version --client --output=yaml
 #### 현재 컨테이너에서 테스트하고 있는데, uname -r로 확인하는 커널 버전은 컨테이너 밖 host의 커널 버전이다.
 #### cat /etc/os-release로 표시되는 건 container 안 ubuntu 버전이다.
 #### ![image](https://github.com/user-attachments/assets/7a4e18ee-ac31-4457-a8fc-f9b1c93850b2)
+#### <br/>
+
+#### 커널 버전 각 의미(uname -r 에서 확인하는 것)
+| 항목        | 설명                                                           |
+| --------- | ------------------------------------------------------------ |
+| `6.8.0`  | 커널 **메인 버전** (Major.Minor.Patch)                             |
+| `62`     | Ubuntu에서 자체적으로 붙이는 **패치 버전** 또는 **빌드 번호**                    |
+| `generic` | 빌드된 커널의 **타입(variant)**. 주로 **일반 목적**(General-purpose)으로 사용됨 |
+
 ### <br/>
 
 ### 2. ip, MAC 주소 확인
