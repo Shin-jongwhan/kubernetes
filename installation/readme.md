@@ -1,4 +1,4 @@
-### 250630
+### 250724
 # install kubernetes
 ### 설치 대상
 | 구성 요소       | Master 노드 | Worker 노드 |
