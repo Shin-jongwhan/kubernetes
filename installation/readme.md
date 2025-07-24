@@ -421,6 +421,20 @@ sudo systemctl status cri-docker.service
 
 ## kubeadm config, init
 ### 컨트롤 플레인을 띄우기 위한 작업이다.
+#### <br/>
+
+### kubeadm init 명령어가 하는 일
+#### kubeadm init은 다음 작업을 자동으로 수행한다.
+- ✅ CA 인증서 및 TLS 인증서 생성
+- ✅ API Server, Controller Manager, Scheduler, etcd 등 핵심 컴포넌트 설정
+- ✅ /etc/kubernetes/ 디렉토리 생성 및 구성 (admin.conf, pki/, etc)
+- ✅ kubelet 설정 및 시작
+- ✅ kube-proxy 및 CoreDNS 설정을 위한 기본 매니페스트 생성
+- ✅ kubeadm join에 사용할 토큰 출력
+#### 결과적으로, 이 명령어를 실행하면 노드는 클러스터의 제어 센터(마스터 노드) 가 된다.
+#### 다른 워커 노드들은 kubeadm join 명령으로 이 마스터에 연결하게 된다.
+### <br/>
+
 ### init config 파일 생성
 ```
 kubeadm config print init-defaults > kubeadm-init.yaml
@@ -452,6 +466,23 @@ nodeRegistration:
 etcd:
   local:
     dataDir: /data/kubernetes/etcd
+
+...
+
+# 필요한 경우 추가 설정. 이 부분은 설정 안 해도 크게 문제 없지만, 나중에 monitoring tool을 쓸 때는 다른 node에서 해당 pod의 상태를 받아와야 하기 때문에 필요해진다.
+controllerManager:
+  extraArgs:
+    bind-address: "0.0.0.0"
+dns: {}
+encryptionAlgorithm: RSA-2048
+etcd:
+  local:
+    dataDir: /data/kubernetes/etcda
+    extraArgs:
+      listen-metrics-urls: "http://0.0.0.0:2381"
+scheduler:
+  extraArgs:
+    bind-address: "0.0.0.0"
 ```
 ### <br/>
 
@@ -462,18 +493,6 @@ sudo kubeadm init --config kubeadm.yaml
 ```
 #### <br/>
 
-### kubeadm init 명령어가 하는 일
-#### kubeadm init은 다음 작업을 자동으로 수행한다.
-- ✅ CA 인증서 및 TLS 인증서 생성
-- ✅ API Server, Controller Manager, Scheduler, etcd 등 핵심 컴포넌트 설정
-- ✅ /etc/kubernetes/ 디렉토리 생성 및 구성 (admin.conf, pki/, etc)
-- ✅ kubelet 설정 및 시작
-- ✅ kube-proxy 및 CoreDNS 설정을 위한 기본 매니페스트 생성
-- ✅ kubeadm join에 사용할 토큰 출력
-#### 결과적으로, 이 명령어를 실행하면 노드는 클러스터의 제어 센터(마스터 노드) 가 된다.
-#### 다른 워커 노드들은 kubeadm join 명령으로 이 마스터에 연결하게 된다.
-### <br/>
-
 ### 만약 config가 수정이 되서 다시 실행하고자 한다면 아래 명령어로 종료시킨다. 
 ```
 sudo kubeadm reset -f --cri-socket unix:///var/run/cri-dockerd.sock
@@ -481,8 +500,11 @@ sudo kubeadm reset -f --cri-socket unix:///var/run/cri-dockerd.sock
 sudo kubeadm init --config kubeadm.yaml
 ```
 #### ![image](https://github.com/user-attachments/assets/5e438386-02de-4171-b001-3cc8f0dcee0f)
-#### <br/>
+### <br/><br/>
 
+
+## kubeadm init 반영 후 수동으로 추가 설정하는 방법
+### 이 파트는 꼭 안 봐도 되니 참고만 하기
 ### cubectl로 kube-system 확인
 ```
 # 없으면 만들기
@@ -493,7 +515,7 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 # kube-system 확인
 kubectl get pods -n kube-system
 ```
-### <br/>
+#### <br/>
 
 ### worker node가 join 할 때 사용할 token이랑 cert-hash 값 출력은 아래 명령어로 확인한다. 이걸 기억해놔야 worker node를 설정할 수 있다.
 ```
@@ -615,6 +637,7 @@ sudo netstat -tulnp | grep 10249
 #### <img width="799" height="34" alt="image" src="https://github.com/user-attachments/assets/146f128d-344c-453a-b6ff-74b214397276" />
 
 ### <br/><br/>
+
 
 ## CNI (Container Network Interface)
 ### CNI에 대해서는 아래를 참고하자. 나는 여기서 calico를 사용해볼 것이다.
