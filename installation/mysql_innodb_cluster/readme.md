@@ -102,15 +102,65 @@ helm search repo mysql-operator/mysql-innodbcluster --versions
 ### <br/>
 
 ### mysql-innodbcluster 설치
+#### install-mysql-innodbcluster.sh
 ```
-# 기존에 설치한 것이 있으면 삭제
-helm uninstall my-mysql-innodbcluster -n tgf
-# 재설치
-helm install my-mysql-innodbcluster mysql-operator/mysql-innodbcluster \
-  --namespace service \
-  --version 2.2.5 \
-  --set credentials.root.password="mypassword" \
-  --set tls.useSelfSigned=true
+#!/bin/bash
+
+# 기존에 설치된 클러스터 제거
+helm uninstall my-mysql-innodbcluster -n service
+kubectl delete pod -n service my-mysql-innodbcluster-0 my-mysql-innodbcluster-1 my-mysql-innodbcluster-2
+kubectl delete pvc -l app.kubernetes.io/instance=my-mysql-innodbcluster -n service
+kubectl delete secret my-mysql-innodbcluster-ca-secret -n service
+kubectl delete secret my-mysql-innodbcluster-tls-secret -n service
+kubectl delete secret my-mysql-innodbcluster-router-tls-secret -n service
+
+# ===============================
+# 설정
+# ===============================
+VERSION="2.2.5"
+NAMESPACE="service"
+CLUSTER_NAME="my-mysql-innodbcluster"
+CERT_PATH="/path/to/your/certs"  # 실제 인증서 경로로 수정 필요
+
+# secret 이름 설정
+CA_SECRET="$CLUSTER_NAME-ca-secret"
+TLS_SECRET="$CLUSTER_NAME-tls-secret"
+ROUTER_TLS_SECRET="$CLUSTER_NAME-router-tls-secret"
+
+# ===============================
+# 네임스페이스 생성
+# ===============================
+kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
+
+# ===============================
+# 인증서 Secret 생성
+# ===============================
+kubectl create secret generic "$CA_SECRET" \
+  --namespace="$NAMESPACE" --dry-run=client --save-config -o yaml \
+  --from-file=ca.pem="$CERT_PATH/ca.pem" \
+  | kubectl apply -f -
+
+kubectl create secret tls "$TLS_SECRET" \
+  --namespace="$NAMESPACE" --dry-run=client --save-config -o yaml \
+  --cert="$CERT_PATH/server-cert.pem" --key="$CERT_PATH/server-key.pem" \
+  | kubectl apply -f -
+
+kubectl create secret tls "$ROUTER_TLS_SECRET" \
+  --namespace="$NAMESPACE" --dry-run=client --save-config -o yaml \
+  --cert="$CERT_PATH/router-cert.pem" --key="$CERT_PATH/router-key.pem" \
+  | kubectl apply -f -
+
+# ===============================
+# Helm으로 InnoDB Cluster 설치
+# ===============================
+helm install "$CLUSTER_NAME" mysql-operator/mysql-innodbcluster \
+  --namespace "$NAMESPACE" \
+  --version "$VERSION" \
+  --set credentials.root.password="REPLACE_WITH_STRONG_PASSWORD" \
+  --set tls.useSelfSigned=false \
+  --set tls.caSecretName="$CA_SECRET" \
+  --set tls.serverCertAndPKsecretName="$TLS_SECRET" \
+  --set tls.routerCertAndPKsecretName="$ROUTER_TLS_SECRET"
 ```
 #### <br/>
 
@@ -121,4 +171,83 @@ helm install my-mysql-innodbcluster mysql-operator/mysql-innodbcluster \
 ### 이제 pod들이 잘 떴는지 확인해보자.
 ```
 kubectl get pods -n service
+```
+#### <img width="707" height="37" alt="image" src="https://github.com/user-attachments/assets/3f8175ff-d2aa-4494-8e97-8fd81a949c3c" />
+### <br/>
+
+### 혹시 계속 initializing 상태가 지속된다면 log를 확인해보자.
+#### 트러블슈팅은 아래에 별도로 정리해두었다.
+```
+kubectl get innodbclusters -n tgf
+```
+### <br/><br/>
+
+
+-------------
+
+# Troubleshooting
+## connection 실패
+### 해결 못 함. 추후 해결 예정
+### log 확인
+```
+# mysql operator
+kubectl logs deploy/mysql-operator -n tgf
+# mysql 개별 pod
+kubectl logs my-mysql-innodbcluster-0 -n tgf
+```
+### <br/>
+
+### 접속 실패 에러가 나온다.
+#### 은 현재 MySQL Operator가 자동으로 생성한 사용자 계정(mysqladmin-...)을 이용해 MySQL 인스턴스에 접속을 시도했지만, 로그인에 실패했다는 것을 의미한다.
+```
+Traceback (most recent call last):
+  File "/usr/lib/mysqlsh/python-packages/mysqloperator/controller/shellutils.py", line 93, in call
+    return f(*args)
+mysqlsh.DBError: MySQL Error (1045): Access denied for user 'mysqladmin-AMaQGebc9H'@'192.168.183.69' (using password: YES)
+
+[2025-07-28 05:19:18,457] kopf.objects         [INFO    ] Error executing mysqlsh.connect_dba, retrying after 10s: MySQL Error (1045): Access denied for user 'mysqladmin-AMaQGebc9H'@'192.168.183.69' (using password: YES)
+[2025-07-28 05:19:23,086] kopf.objects         [WARNING ] Patching failed with inconsistencies: (('remove', ('status', 'kopf'), {'dummy': '2025-07-28T05:19:23.062214+00:00'}, None),)
+[2025-07-28 05:19:23,204] kopf.objects         [INFO    ] ignored pod event
+[2025-07-28 05:19:23,204] kopf.objects         [INFO    ] Handler 'on_pod_event' succeeded.
+on_pod_create: pod=my-mysql-innodbcluster-2 ContainersReady=True Ready=False gate[configured]=True
+[2025-07-28 05:19:23,223] kopf.objects         [INFO    ] on_pod_create: cluster create time None
+[2025-07-28 05:19:23,223] kopf.objects         [ERROR   ] Handler 'on_pod_create' failed temporarily: my-mysql-innodbcluster busy. lock_owner=my-mysql-innodbcluster-0 owner_context=n/a lock_created_at=2025-07-28T05:05:19.271456
+[2025-07-28 05:19:23,246] kopf.objects         [WARNING ] Patching failed with inconsistencies: (('remove', ('status', 'kopf'), {'progress': {'on_pod_create': {'started': '2025-07-28T05:04:49.016456+00:00', 'stopped': None, 'delayed': '2025-07-28T05:19:33.223609+00:00', 'purpose': 'create', 'retries': 85, 'success': False, 'failure': False, 'message': 'my-mysql-innodbcluster busy. lock_owner=my-mysql-innodbcluster-0 owner_context=n/a lock_created_at=2025-07-28T05:05:19.271456', 'subrefs': None}}}, None),)
+```
+### <br/>
+
+### MySQL Operator는 클러스터 초기화 중 내부적으로 다음 작업들을 자동으로 수행한다.
+- root 계정으로 접속
+- 내부 관리용 계정 mysqladmin-<랜덤> 생성
+- 해당 계정으로 다시 접속하여 replication 및 group replication 구성
+### <br/>
+
+### <br/><br/>
+
+## innodbcluster 삭제 실패
+### 아래 명령어가 계속 홀드 상태일 때의 경우다.
+```
+kubectl delete innodbcluster my-mysql-innodbcluster -n service
+```
+#### <br/>
+
+### 이 명령어를 입력하면 finalizers가 나오는데, 이걸 삭제해줘야 한다.
+```
+kubectl get innodbcluster my-mysql-innodbcluster -n tgf -o json | grep finalizers -A 2
+```
+#### <br/>
+
+#### finalizers 항목
+```
+        "finalizers": [
+            "mysql.oracle.com/cluster"
+        ],
+```
+### <br/>
+
+### 아래와 같이 적용한 후에 다시 삭제를 시도해보면 잘 된다.
+```
+kubectl get innodbcluster my-mysql-innodbcluster -n tgf -o json > cluster.json
+# 파일에서 finalizers를 삭제한 후 적용
+kubectl replace -f cluster.json
 ```
