@@ -101,7 +101,7 @@ Create an MySQL InnoDB Cluster by executing:
 ### <br/>
 
 ### mysql-innodbcluster 설치 가능한 버전 확인
-#### 아래 버전 중에 가장 최신을 사용하면 된다.
+#### 아래 버전 중에 가장 최신을 사용하면 되는데, 해보니 버전을 굳이 명시하지 않아도 된다.
 ```
 helm search repo mysql-operator/mysql-innodbcluster --versions
 ```
@@ -109,65 +109,30 @@ helm search repo mysql-operator/mysql-innodbcluster --versions
 ### <br/>
 
 ### mysql-innodbcluster 설치
-#### install-mysql-innodbcluster.sh
+#### 아래는 참고 자료로 남겨두었다. 굳이 사용할 필요는 없을 것 같다.
+#### [install-mysql-innodbcluster.sh](https://github.com/Shin-jongwhan/kubernetes/blob/main/installation/mysql_innodb_cluster/install-mysql-innodbcluster-with-ca-tls.sh)
+#### <br/>
+
+### credentials.yaml 작성
+#### helm install 시 --set 옵션으로도 할 수 있는데 yaml로 관리하는 게 훨씬 용이하다.
 ```
-#!/bin/bash
+credentials:
+  root:
+    user: "root"
+    password: "mypassword"
+    host: "%"
 
-# 기존에 설치된 클러스터 제거
-helm uninstall my-mysql-innodbcluster -n service
-kubectl delete pod -n service my-mysql-innodbcluster-0 my-mysql-innodbcluster-1 my-mysql-innodbcluster-2
-kubectl delete pvc -l app.kubernetes.io/instance=my-mysql-innodbcluster -n service
-kubectl delete secret my-mysql-innodbcluster-ca-secret -n service
-kubectl delete secret my-mysql-innodbcluster-tls-secret -n service
-kubectl delete secret my-mysql-innodbcluster-router-tls-secret -n service
+serverInstances: 3
+routerInstances: 1
 
-# ===============================
-# 설정
-# ===============================
-VERSION="2.2.5"
-NAMESPACE="service"
-CLUSTER_NAME="my-mysql-innodbcluster"
-CERT_PATH="/path/to/your/certs"  # 실제 인증서 경로로 수정 필요
+tls:
+  useSelfSigned: true
+```
+#### <br/>
 
-# secret 이름 설정
-CA_SECRET="$CLUSTER_NAME-ca-secret"
-TLS_SECRET="$CLUSTER_NAME-tls-secret"
-ROUTER_TLS_SECRET="$CLUSTER_NAME-router-tls-secret"
-
-# ===============================
-# 네임스페이스 생성
-# ===============================
-kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
-
-# ===============================
-# 인증서 Secret 생성
-# ===============================
-kubectl create secret generic "$CA_SECRET" \
-  --namespace="$NAMESPACE" --dry-run=client --save-config -o yaml \
-  --from-file=ca.pem="$CERT_PATH/ca.pem" \
-  | kubectl apply -f -
-
-kubectl create secret tls "$TLS_SECRET" \
-  --namespace="$NAMESPACE" --dry-run=client --save-config -o yaml \
-  --cert="$CERT_PATH/server-cert.pem" --key="$CERT_PATH/server-key.pem" \
-  | kubectl apply -f -
-
-kubectl create secret tls "$ROUTER_TLS_SECRET" \
-  --namespace="$NAMESPACE" --dry-run=client --save-config -o yaml \
-  --cert="$CERT_PATH/router-cert.pem" --key="$CERT_PATH/router-key.pem" \
-  | kubectl apply -f -
-
-# ===============================
-# Helm으로 InnoDB Cluster 설치
-# ===============================
-helm install "$CLUSTER_NAME" mysql-operator/mysql-innodbcluster \
-  --namespace "$NAMESPACE" \
-  --version "$VERSION" \
-  --set credentials.root.password="REPLACE_WITH_STRONG_PASSWORD" \
-  --set tls.useSelfSigned=false \
-  --set tls.caSecretName="$CA_SECRET" \
-  --set tls.serverCertAndPKsecretName="$TLS_SECRET" \
-  --set tls.routerCertAndPKsecretName="$ROUTER_TLS_SECRET"
+### 아래 명령어로 설치한다. 
+```
+helm install mycluster mysql-operator/mysql-innodbcluster -n service --values credentials.yaml
 ```
 #### <br/>
 
@@ -175,11 +140,33 @@ helm install "$CLUSTER_NAME" mysql-operator/mysql-innodbcluster \
 #### <img width="359" height="104" alt="image" src="https://github.com/user-attachments/assets/5934231f-81a8-44da-8507-afb1088c9c8c" />
 ### <br/>
 
-### 이제 pod들이 잘 떴는지 확인해보자.
+### 이제 pod들이 잘 떴는지 확인해보자. 
+#### * 그런데 아래 스크린샷 보면 router가 아직 에러가 있어서 정상적으로 실행이 안 되고 있다. 이는 따로 정리할 예정이다. 
+#### 하지만 개별 mysql pod를 접속해보면 잘 접속은 된다. 여기서는 일단 여기까지만 확인하자.
 ```
 kubectl get pods -n service
+# or
+kubectl get all -n service
 ```
 #### <img width="707" height="37" alt="image" src="https://github.com/user-attachments/assets/3f8175ff-d2aa-4494-8e97-8fd81a949c3c" />
+#### <img width="939" height="570" alt="image" src="https://github.com/user-attachments/assets/57a36735-d5e9-4730-9c9b-e503b60bab3a" />
+### <br/>
+
+### mysqlsh로 접속 확인
+```
+kubectl exec -it -n tgf mycluster-0 -- bash
+```
+
+#### 접속 후 pod 안에서 아래 입력 후 설정한 비밀번호로 접속
+```
+mysqlsh root@localhost
+```
+
+#### SQL 테스트
+```
+show databases;
+```
+#### <img width="854" height="446" alt="image" src="https://github.com/user-attachments/assets/df28a3c2-c588-4870-b461-9d8a469dc25f" />
 ### <br/>
 
 ### 혹시 계속 initializing 상태가 지속된다면 log를 확인해보자.
@@ -277,4 +264,25 @@ kubectl get innodbcluster my-mysql-innodbcluster -n tgf -o json | grep finalizer
 kubectl get innodbcluster my-mysql-innodbcluster -n tgf -o json > cluster.json
 # 파일에서 finalizers를 삭제한 후 적용
 kubectl replace -f cluster.json
+```
+### <br/><br/>
+
+
+## cluster 완전 제거
+```
+# mysql-operator 제거
+helm uninstall mysql-operator -n service
+helm install mysql-operator mysql-operator/mysql-operator -n service --version 2.2.5
+
+# 기존에 설치된 클러스터 제거
+helm uninstall my-mysql-innodbcluster -n service
+kubectl delete pod -n service my-mysql-innodbcluster-0 my-mysql-innodbcluster-1 my-mysql-innodbcluster-2
+
+# pvc 제거
+kubectl delete pvc -l app.kubernetes.io/instance=my-mysql-innodbcluster -n service
+
+# secret 등록했다면 제거
+kubectl delete secret my-mysql-innodbcluster-ca-secret -n service
+kubectl delete secret my-mysql-innodbcluster-tls-secret -n service
+kubectl delete secret my-mysql-innodbcluster-router-tls-secret -n service
 ```
