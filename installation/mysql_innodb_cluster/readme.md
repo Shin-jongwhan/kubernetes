@@ -3,6 +3,12 @@
 ### kubernetes에서 mysql innodb cluster를 구성하는 방법에 대해 알아보자.
 ### 참고
 #### https://hackjsp.tistory.com/20
+#### <br/>
+
+### MySQL 공식 사이트에서 아래 과정을 따라가면 쉽게 설치 가능
+#### 1. https://dev.mysql.com/doc/mysql-operator/en/mysql-operator-installation-helm.html
+#### 2. https://dev.mysql.com/doc/mysql-operator/en/mysql-operator-innodbcluster-simple-helm.html
+#### 3. https://dev.mysql.com/doc/mysql-operator/en/mysql-operator-connecting-mysql-shell.html
 ### <br/>
 
 ### innodb cluster architecture는 다음과 같이 생겼다.
@@ -21,6 +27,7 @@
 ### 다음과 같은 architecture를 가지고 있다.
 ### 좀 복잡한 것 같은데, 기본적인 구조는 innodb cluster architecture와 같은데, 몇 가지가 추가되었을 뿐이다.
 - mysqlsh에서 kubernetes에서 관리할 수 있도록 kubectl을 연결
+- StatefulSet : master + replica pod를 관리해주는 사이드카. 
 - mysql load balancer layer 추가 : mysql router 바로 위의 layer로 load balancing을 담당한다.
 - ingress layer : mysql에 실제적인 영향을 주는 layer는 아니긴 해서 참고만 해도 될 듯 하다. mysql을 비롯한 서비스의 접속 주소에 대한 프록시를 담당해준다.
 #### <img width="720" height="678" alt="image" src="https://github.com/user-attachments/assets/07eab69b-778d-4e16-b275-a324d41f9893" />
@@ -187,7 +194,7 @@ kubectl get innodbclusters -n tgf
 
 # Troubleshooting
 ## connection 실패
-### 해결 못 함. 추후 해결 예정
+### 이거는 helm으로 설치할 때 --set으로 하는 config (또는 yaml) 설정 문제이다.
 ### log 확인
 ```
 # mysql operator
@@ -216,11 +223,31 @@ on_pod_create: pod=my-mysql-innodbcluster-2 ContainersReady=True Ready=False gat
 ```
 ### <br/>
 
-### MySQL Operator는 클러스터 초기화 중 내부적으로 다음 작업들을 자동으로 수행한다.
-- root 계정으로 접속
-- 내부 관리용 계정 mysqladmin-<랜덤> 생성
-- 해당 계정으로 다시 접속하여 replication 및 group replication 구성
+### 다음과 같이 수정해서 다시 설치해보자.
+#### credentials.yaml
+```
+credentials:
+  root:
+    user: "root"
+    password: "BioSys&(80"
+    host: "%"
+
+serverInstances: 3
+routerInstances: 1
+
+tls:
+  useSelfSigned: true
+```
 ### <br/>
+
+### 설치
+```
+# uninstall
+helm uninstall mycluster -n tgf
+
+# install
+helm install mycluster mysql-operator/mysql-innodbcluster -n tgf --values credentials.yaml
+```
 
 ### <br/><br/>
 
