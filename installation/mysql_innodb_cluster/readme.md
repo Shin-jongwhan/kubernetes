@@ -154,7 +154,7 @@ kubectl get all -n service
 
 ### mysqlsh로 접속 확인
 ```
-kubectl exec -it -n tgf mycluster-0 -- bash
+kubectl exec -it -n service mycluster-0 -- bash
 ```
 
 #### 접속 후 pod 안에서 아래 입력 후 설정한 비밀번호로 접속
@@ -172,7 +172,7 @@ show databases;
 ### 혹시 계속 initializing 상태가 지속된다면 log를 확인해보자.
 #### 트러블슈팅은 아래에 별도로 정리해두었다.
 ```
-kubectl get innodbclusters -n tgf
+kubectl get innodbclusters -n service
 ```
 ### <br/><br/>
 
