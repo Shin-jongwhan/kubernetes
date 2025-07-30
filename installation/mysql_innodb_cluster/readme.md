@@ -141,7 +141,7 @@ helm install mycluster mysql-operator/mysql-innodbcluster -n service --values cr
 ### <br/>
 
 ### 이제 pod들이 잘 떴는지 확인해보자. 
-#### * 그런데 아래 스크린샷 보면 router가 아직 에러가 있어서 정상적으로 실행이 안 되고 있다. 해결 방법은 아래에 troubleshooting 파트에서 router pod 설정 관련 내용을 참고하자.
+#### * 그런데 아래 스크린샷 보면 router가 아직 에러가 있어서 정상적으로 실행이 안 되고 있다. 해결 방법은 아래에 troubleshooting 파트에서 router pod 설정 관련 내용을 참고하여 해결하자.
 #### 하지만 개별 mysql pod를 접속해보면 잘 접속은 된다. 여기서는 일단 여기까지만 확인하자.
 ```
 kubectl get pods -n service
@@ -176,6 +176,62 @@ kubectl get innodbclusters -n service
 ```
 ### <br/><br/>
 
+
+## (내부망 네트워크에 있는 다른 컴퓨터) 외부 접속 허용하기 + router 작동 확인
+### 먼저 mysql cluster router가 켜져 있어야 하고(아래 router 관련 트러블슈팅 확인), nodeport를 하나 열어줘야 한다.
+### single primary node는 6446 port를 이용한다.
+#### mycluster-nodeport.yaml
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mycluster-nodeport
+  namespace: tgf
+  labels:
+    app.kubernetes.io/instance: mysql-innodbcluster-mycluster
+    app.kubernetes.io/component: mysqlrouter
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/component: router
+  ports:
+    - name: mysqlrw
+      protocol: TCP
+      port: 6446         # 내부 ClusterIP에서 사용하던 포트
+      targetPort: 6446
+      nodePort: 30161    # 외부에서 접근할 NodePort
+```
+#### <br/>
+
+### 적용
+```
+kubectl apply -f mycluster-nodeport.yaml
+```
+### <br/>
+
+### 이후에 접속 테스트를 위한 계정을 하나 만들어본다.
+```
+kubectl exec -it mycluster-0 -n tgf -c mysql -- bash
+
+# (pod 내에서) port 접속 후 비밀번호 입력
+mysql -uroot -p
+
+# (mysql shell 내에서)
+# primary node인지 확인. 0이면 primary node이다.
+SELECT @@super_read_only;
+
+# 계정 생성
+CREATE USER 'test'@'%' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON *.* TO 'test'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+```
+### <br/>
+
+### 외부에서 접속을 해본다.
+#### port가 위에서 설정한 nodeport와 같아야 한다.
+#### host에는 kubernetes node로 등록된 곳 어느 주소이든 입력해도 접속이 가능하다. 이게 가능하면 router가 잘 기능하고 있다는 증거이다.
+#### <img width="500" height="383" alt="image" src="https://github.com/user-attachments/assets/58680d70-9fe2-4c60-93c2-ac28de91151a" />
+### <br/><br/>
 
 -------------
 
