@@ -141,7 +141,7 @@ helm install mycluster mysql-operator/mysql-innodbcluster -n service --values cr
 ### <br/>
 
 ### 이제 pod들이 잘 떴는지 확인해보자. 
-#### * 그런데 아래 스크린샷 보면 router가 아직 에러가 있어서 정상적으로 실행이 안 되고 있다. 이는 따로 정리할 예정이다. 
+#### * 그런데 아래 스크린샷 보면 router가 아직 에러가 있어서 정상적으로 실행이 안 되고 있다. 해결 방법은 아래에 troubleshooting 파트에서 router pod 설정 관련 내용을 참고하자.
 #### 하지만 개별 mysql pod를 접속해보면 잘 접속은 된다. 여기서는 일단 여기까지만 확인하자.
 ```
 kubectl get pods -n service
@@ -286,3 +286,20 @@ kubectl delete secret my-mysql-innodbcluster-ca-secret -n service
 kubectl delete secret my-mysql-innodbcluster-tls-secret -n service
 kubectl delete secret my-mysql-innodbcluster-router-tls-secret -n service
 ```
+## <br/><br/>
+
+## cluster router DNS로 인한 통신 문제
+### router가 어떤 이름으로 떠 있는지 확인한다.
+```
+kubectl get deploy -n tgf
+```
+#### <img width="474" height="68" alt="image" src="https://github.com/user-attachments/assets/73b3c6e0-d710-47bb-8967-352f37732ac2" />
+### <br/>
+
+### 해당 deploy에 대한 yaml을 추출한다.
+```
+kubectl get deploy mycluster-router -n tgf -o yaml > mycluster-router.yaml
+```
+### <br/>
+
+
