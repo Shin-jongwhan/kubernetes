@@ -302,4 +302,20 @@ kubectl get deploy mycluster-router -n tgf -o yaml > mycluster-router.yaml
 ```
 ### <br/>
 
-
+### 해당 yaml을 열어서 다음을 추가한다.
+#### 참고로 service는 namespace 이름이다.
+```
+spec:
+  template:
+    spec:
+      # 아래를 추가하면 됨
+      dnsPolicy: None
+      dnsConfig:
+        searches:
+          - service.svc.cluster.local
+          - svc.cluster.local
+          - cluster.local
+        options:
+          - name: ndots
+            value: "1"
+```
