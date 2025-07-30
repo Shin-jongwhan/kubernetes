@@ -272,7 +272,7 @@ on_pod_create: pod=my-mysql-innodbcluster-2 ContainersReady=True Ready=False gat
 credentials:
   root:
     user: "root"
-    password: "BioSys&(80"
+    password: "your_password"
     host: "%"
 
 serverInstances: 3
