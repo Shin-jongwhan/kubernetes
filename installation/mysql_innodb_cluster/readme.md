@@ -319,3 +319,19 @@ spec:
           - name: ndots
             value: "1"
 ```
+### <br/>
+
+### 적용
+#### --force를 붙이면 yaml이 다르더라도 강제로 적용한다. 경우에 따라 사용한다.
+```
+kubectl replace -f mycluster-router.yaml --force
+```
+### <br/>
+
+### pod가 잘 떴는지 확인한다.
+```
+kubectl get all -n service
+```
+#### <img width="941" height="583" alt="image" src="https://github.com/user-attachments/assets/71eb8949-201d-4c28-a6db-4c18e1ebb5ba" />
+### <br/><br/>
+
