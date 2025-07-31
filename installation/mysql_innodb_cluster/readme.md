@@ -11,6 +11,10 @@
 #### 3. https://dev.mysql.com/doc/mysql-operator/en/mysql-operator-connecting-mysql-shell.html
 ### <br/>
 
+### MySQL 공식 사이트에서 어떤 Resource Properties를 지원하는지 잘 정리해주었다. 꼭 참고하자.
+#### https://dev.mysql.com/doc/mysql-operator/en/mysql-operator-properties.html
+### <br/>
+
 ### innodb cluster architecture는 다음과 같이 생겼다.
 ### default는 되게 간단하다.
 - router 1개 : primary + secondary에 라우팅 역할. 내부적으로 접속 요청을 읽기/쓰기 분리 라우팅을 함.
@@ -233,6 +237,21 @@ FLUSH PRIVILEGES;
 #### <img width="500" height="383" alt="image" src="https://github.com/user-attachments/assets/58680d70-9fe2-4c60-93c2-ac28de91151a" />
 ### <br/><br/>
 
+
+## custom mycnf
+#### https://dev.mysql.com/doc/mysql-operator/en/mysql-operator-properties.html
+### MySQL 공식 사이트에서 아래 하위에 사용하면 된다고 정리해주었다.
+- InnoDBCluster.spec
+- InnoDBCluster.spec.readReplicas\[index\]
+| **Name** | **Type** | **Description**                             | **Required** |
+| -------- | -------- | ------------------------------------------- | ------------ |
+| mycnf    | string   | Custom configuration additions for `my.cnf` | false        |
+
+### <br/>
+
+
+
+
 -------------
 
 # Troubleshooting
@@ -329,6 +348,9 @@ kubectl replace -f cluster.json
 # mysql-operator 제거
 helm uninstall mysql-operator -n service
 helm install mysql-operator mysql-operator/mysql-operator -n service --version 2.2.5
+
+# finalizer 제거(필요시)
+kubectl patch innodbcluster my-mysql-innodbcluster -n tgf -p '{"metadata":{"finalizers":null}}' --type=merge
 
 # 기존에 설치된 클러스터 제거
 helm uninstall my-mysql-innodbcluster -n service
