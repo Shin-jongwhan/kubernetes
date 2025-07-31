@@ -241,6 +241,7 @@ FLUSH PRIVILEGES;
 ## custom mycnf
 #### https://dev.mysql.com/doc/mysql-operator/en/mysql-operator-properties.html
 ### MySQL 공식 사이트에서 아래 하위에 사용하면 된다고 정리해주었다.
+### ❗ 그런데 이걸로 따라하면 안 됨 ! 참고만 하자.
 - InnoDBCluster.spec
 - InnoDBCluster.spec.readReplicas\[index\]
 | **Name** | **Type** | **Description**                             | **Required** |
@@ -249,8 +250,94 @@ FLUSH PRIVILEGES;
 
 ### <br/>
 
+### 먼저 mysql-innodbcluster를 다운로드 받아보자.
+### 아래 보면 values.yaml이 있다.
+#### * 버전에 따라 얼마든지 옵션 설정하는 방법은 바뀔 수 있으니 버전이 다르다면 다시 확인하자.
+```
+helm pull mysql-operator/mysql-innodbcluster --untar
+```
+#### <img width="681" height="180" alt="image" src="https://github.com/user-attachments/assets/39e26e4e-51b1-472a-aec0-14259174db79" />
+### <br/>
 
+### 열어보면 mycnf를 어떻게 사용해야 하는지 나와 있다.
+#### <img width="244" height="98" alt="image" src="https://github.com/user-attachments/assets/6b17003d-c7ca-441f-ad00-aec179044924" />
+### <br/>
 
+### 위 예시로 적용해보자.
+#### helm_mysql_cluster_conf.yaml
+```
+credentials:
+  root:
+    user: "root"
+    password: "mypassword"
+    host: "%"
+
+serverInstances: 3
+routerInstances: 1
+
+tls:
+  useSelfSigned: true
+
+serverConfig:
+  mycnf: |
+    [mysqld]
+    log-bin=/var/lib/mysql/mysql-bin.log
+    binlog_expire_logs_seconds = 864000
+    max_binlog_size = 100M
+    log_bin_trust_function_creators = 1
+    collation-server = utf8mb4_general_ci
+    default-time-zone = "+09:00"
+    max_connections = 500
+    [mysqldump]
+    default-character-set = utf8mb4
+    [mysql]
+    default-character-set = utf8mb4
+
+```
+### <br/>
+
+### 설치하고 pod에 들어가보자.
+### pod에 들어갈 때는 -c mysql로 sidecar가 아닌 pod로 접속해야 한다.
+```
+kubectl exec -it -n service -c mysql mycluster-0 -- bash
+```
+#### <br/>
+
+### pod 안에서 99-extra.cnf를 확인해보자.
+```
+cat /etc/my.cnf.d/99-extra.cnf
+```
+#### <br/>
+
+### 여기에 이렇게 반영이 잘 되어 있다.
+```
+# Additional user configurations taken from spec.mycnf in InnoDBCluster.
+# Do not edit directly.
+[mysqld]
+log-bin=/var/lib/mysql/mysql-bin.log
+binlog_expire_logs_seconds = 864000
+max_binlog_size = 100M
+log_bin_trust_function_creators = 1
+collation-server = utf8mb4_general_ci
+default-time-zone = "+09:00"
+max_connections = 500
+[mysqldump]
+default-character-set = utf8mb4
+[mysql]
+default-character-set = utf8mb4
+```
+### <br/>
+
+### mysql에 접속해서 확인해보자.
+```
+# 접속
+mysql -u root -p
+
+# 쿼리
+SHOW VARIABLES LIKE 'time_zone';
+```
+#### <img width="342" height="123" alt="image" src="https://github.com/user-attachments/assets/299232c0-8a58-493d-97ea-43e73166d045" />
+### <br/><br/>
 
 -------------
 
@@ -350,10 +437,11 @@ helm uninstall mysql-operator -n service
 helm install mysql-operator mysql-operator/mysql-operator -n service --version 2.2.5
 
 # finalizer 제거(필요시)
-kubectl patch innodbcluster my-mysql-innodbcluster -n tgf -p '{"metadata":{"finalizers":null}}' --type=merge
+kubectl patch innodbcluster my-mysql-innodbcluster -n service -p '{"metadata":{"finalizers":null}}' --type=merge
 
 # 기존에 설치된 클러스터 제거
 helm uninstall my-mysql-innodbcluster -n service
+kubectl delete innodbcluster my-mysql-innodbcluster -n service
 kubectl delete pod -n service my-mysql-innodbcluster-0 my-mysql-innodbcluster-1 my-mysql-innodbcluster-2
 
 # pvc 제거
