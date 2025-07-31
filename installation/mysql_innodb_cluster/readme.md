@@ -523,27 +523,6 @@ kubectl replace -f mycluster-router.yaml --force
 ```
 ### <br/>
 
-### 한 방에 쉘 스크립트로 하는 방법
-#### 먼저 yq를 설치한다.
-```
-# yq는 YAML을 구조적으로 다룰 수 있는 도구이다.
-#wget https://github.com/mikefarah/yq/releases/download/v4.43.1/yq_linux_amd64 -O /usr/local/bin/yq
-#chmod +x /usr/local/bin/yq
-
-kubectl get deploy mycluster-router -n service -o yaml > mycluster-router.yaml
-
-yq eval '
-.spec.template.spec.dnsPolicy = "None" |
-.spec.template.spec.dnsConfig = {
-  "options": [{"name": "ndots", "value": "1"}],
-  "searches": ["service.svc.cluster.local", "svc.cluster.local", "cluster.local"]
-}
-' -i mycluster-router.yaml
-
-kubectl replace -f mycluster-router.yaml --force
-```
-### <br/>
-
 ### pod가 잘 떴는지 확인한다.
 ```
 kubectl get all -n service
