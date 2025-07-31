@@ -190,7 +190,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mycluster-nodeport
-  namespace: tgf
+  namespace: service
   labels:
     app.kubernetes.io/instance: mysql-innodbcluster-mycluster
     app.kubernetes.io/component: mysqlrouter
@@ -215,7 +215,7 @@ kubectl apply -f mycluster-nodeport.yaml
 
 ### 이후에 접속 테스트를 위한 계정을 하나 만들어본다.
 ```
-kubectl exec -it mycluster-0 -n tgf -c mysql -- bash
+kubectl exec -it mycluster-0 -n service -c mysql -- bash
 
 # (pod 내에서) port 접속 후 비밀번호 입력
 mysql -uroot -p
@@ -347,9 +347,9 @@ SHOW VARIABLES LIKE 'time_zone';
 ### log 확인
 ```
 # mysql operator
-kubectl logs deploy/mysql-operator -n tgf
+kubectl logs deploy/mysql-operator -n service
 # mysql 개별 pod
-kubectl logs my-mysql-innodbcluster-0 -n tgf
+kubectl logs my-mysql-innodbcluster-0 -n service
 ```
 ### <br/>
 
@@ -392,10 +392,10 @@ tls:
 ### 설치
 ```
 # uninstall
-helm uninstall mycluster -n tgf
+helm uninstall mycluster -n service
 
 # install
-helm install mycluster mysql-operator/mysql-innodbcluster -n tgf --values credentials.yaml
+helm install mycluster mysql-operator/mysql-innodbcluster -n service --values credentials.yaml
 ```
 
 ### <br/><br/>
@@ -409,7 +409,7 @@ kubectl delete innodbcluster my-mysql-innodbcluster -n service
 
 ### 이 명령어를 입력하면 finalizers가 나오는데, 이걸 삭제해줘야 한다.
 ```
-kubectl get innodbcluster my-mysql-innodbcluster -n tgf -o json | grep finalizers -A 2
+kubectl get innodbcluster my-mysql-innodbcluster -n service -o json | grep finalizers -A 2
 ```
 #### <br/>
 
@@ -423,7 +423,7 @@ kubectl get innodbcluster my-mysql-innodbcluster -n tgf -o json | grep finalizer
 
 ### 아래와 같이 적용한 후에 다시 삭제를 시도해보면 잘 된다.
 ```
-kubectl get innodbcluster my-mysql-innodbcluster -n tgf -o json > cluster.json
+kubectl get innodbcluster my-mysql-innodbcluster -n service -o json > cluster.json
 # 파일에서 finalizers를 삭제한 후 적용
 kubectl replace -f cluster.json
 ```
@@ -455,16 +455,45 @@ kubectl delete secret my-mysql-innodbcluster-router-tls-secret -n service
 ## <br/><br/>
 
 ## cluster router DNS로 인한 통신 문제
+### helm에서 repo를 다운로드받아서 values.yaml을 열어보면 다음과 같이 나와 있는데 좀 더 설명하자면 이렇다.
+- router.podSpec는 처음 Helm 설치 시에만 반영됩니다.
+- 설치 이후에는 Helm upgrade든, InnoDBCluster CR 수정이든 변경해도 적용되지 않습니다.
+- 이후에 이 값을 Helm 차트나 InnoDBCluster YAML에서 변경하더라도, 기존 Router Deployment가 다시 생성되지 않습니다.
+- 즉, 변경사항이 실제 Kubernetes 리소스에 반영되지 않습니다.
+- MySQL Operator는 router.podSpec의 변경을 감지(watch)하지 않기 때문에, 수정해도 Operator가 이를 보고 router를 재배포하지 않습니다.
+### 따라서 별도로 설정하는 게 권장되는 방법이다. 다만 이렇게 하면 helm에서 관리하는 것에서 
+
+```
+#router:
+#  instances: 1
+#  options:
+#  - option1: value1
+#  - option2: value2
+#  bootstrapOptions:
+#  - bootstrapOption1: value1
+#  - bootstrapOption2: value2
+#  certAndPKsecretName:
+#  #IMPORTANT: Once podSpec is set it is carved into stone. If changed, the router deployment won't be rebuilt. podSp
+ec is
+#  #           respected only when during the initial build of of the Innodbcluster and its Router Deployment. Later
+changes
+#  #           to the podSpec, in the Chart of directly in the IC CR/object won't be regarded, as the Operator doesn'
+t watch
+#  #           for changes of router.podSpec.
+...
+```
+### <br/>
+
 ### router가 어떤 이름으로 떠 있는지 확인한다.
 ```
-kubectl get deploy -n tgf
+kubectl get deploy -n service
 ```
 #### <img width="474" height="68" alt="image" src="https://github.com/user-attachments/assets/73b3c6e0-d710-47bb-8967-352f37732ac2" />
 ### <br/>
 
 ### 해당 deploy에 대한 yaml을 추출한다.
 ```
-kubectl get deploy mycluster-router -n tgf -o yaml > mycluster-router.yaml
+kubectl get deploy mycluster-router -n service -o yaml > mycluster-router.yaml
 ```
 ### <br/>
 
@@ -490,6 +519,27 @@ spec:
 ### 적용
 #### --force를 붙이면 yaml이 다르더라도 강제로 적용한다. 경우에 따라 사용한다.
 ```
+kubectl replace -f mycluster-router.yaml --force
+```
+### <br/>
+
+### 한 방에 쉘 스크립트로 하는 방법
+#### 먼저 yq를 설치한다.
+```
+# yq는 YAML을 구조적으로 다룰 수 있는 도구이다.
+#wget https://github.com/mikefarah/yq/releases/download/v4.43.1/yq_linux_amd64 -O /usr/local/bin/yq
+#chmod +x /usr/local/bin/yq
+
+kubectl get deploy mycluster-router -n service -o yaml > mycluster-router.yaml
+
+yq eval '
+.spec.template.spec.dnsPolicy = "None" |
+.spec.template.spec.dnsConfig = {
+  "options": [{"name": "ndots", "value": "1"}],
+  "searches": ["service.svc.cluster.local", "svc.cluster.local", "cluster.local"]
+}
+' -i mycluster-router.yaml
+
 kubectl replace -f mycluster-router.yaml --force
 ```
 ### <br/>
