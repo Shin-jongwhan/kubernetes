@@ -244,6 +244,7 @@ FLUSH PRIVILEGES;
 ### ❗ 그런데 이걸로 따라하면 안 됨 ! 참고만 하자.
 - InnoDBCluster.spec
 - InnoDBCluster.spec.readReplicas\[index\]
+
 | **Name** | **Type** | **Description**                             | **Required** |
 | -------- | -------- | ------------------------------------------- | ------------ |
 | mycnf    | string   | Custom configuration additions for `my.cnf` | false        |
