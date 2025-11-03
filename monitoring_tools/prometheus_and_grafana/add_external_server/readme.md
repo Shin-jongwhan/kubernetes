@@ -104,6 +104,49 @@ helm upgrade prometheus-stack prometheus-community/kube-prometheus-stack -n moni
 ```
 ### <br/>
 
+### secret 생성
+#### prometheus-additional-scrape-secret.yaml
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: prometheus-stack-kube-prom-prometheus-scrape-config
+  namespace: monitoring
+stringData:
+  additional-scrape-configs.yaml: |
+    - job_name: "external-nodes"
+      file_sd_configs:
+        - files:
+            - /etc/prometheus/file_sd/external_target.json
+          refresh_interval: 30s
+
+```
+#### <br/>
+
+### secret 적용
+```
+kubectl apply -f prometheus-additional-scrape-secret.yaml
+```
+### <br/>
+
+### prometheus 패치
+#### 적용하면 'prometheus.monitoring.coreos.com/prometheus-stack-kube-prom-prometheus patched' 이라는 메세지가 나옴
+```
+kubectl -n monitoring patch prometheus prometheus-stack-kube-prom-prometheus \
+  --type='merge' \
+  -p '{"spec":{"additionalScrapeConfigs":{"name":"prometheus-stack-kube-prom-prometheus-scrape-config","key":"additio
+nal-scrape-configs.yaml"}}}'
+```
+### <br/>
+
+### 적용 확인
+```
+kubectl -n monitoring get prometheus prometheus-stack-kube-prom-prometheus -o yaml | grep -A2 additionalScrapeConfigs
+```
+#### <img width="940" height="97" alt="image" src="https://github.com/user-attachments/assets/9dea06ea-6dd5-4b10-81a1-b32c08a2ed81" />
+### <br/><br/>
+
+
 ### 브라우저에서 prometheus에 접속해보자.
 #### status - target helth로 가서 external node가 등록된 걸 확인한다.
 #### <img width="941" height="453" alt="image" src="https://github.com/user-attachments/assets/81e4ff9a-40c8-4491-b0db-f7bf92a02aec" />
