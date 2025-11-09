@@ -1,4 +1,4 @@
-### 250728
+### 251110
 # MySQL innoDB cluster for kubernetes
 ### kubernetes에서 mysql innodb cluster를 구성하는 방법에 대해 알아보자.
 ### 참고
