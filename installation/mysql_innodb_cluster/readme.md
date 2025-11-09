@@ -587,5 +587,10 @@ kubectl logs -n tgf deploy/mycluster-router --tail=200
 ### log 확인
 #### <img width="942" height="71" alt="image" src="https://github.com/user-attachments/assets/58a29ffa-702f-41a5-a8f6-ee9b6c3152c0" />
 #### <img width="945" height="198" alt="image" src="https://github.com/user-attachments/assets/81a33cbb-52c6-42bd-8ce2-ae220cac1e19" />
+### <br/>
+
+### router가 켜진 후 외부에서 접속 되는지 확인한다.
+#### <img width="504" height="437" alt="image" src="https://github.com/user-attachments/assets/6034c202-a9f9-4384-a09f-f991eb76320a" />
+
 ### <br/><br/>
 
