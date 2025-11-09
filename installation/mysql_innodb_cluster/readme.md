@@ -531,3 +531,61 @@ kubectl get all -n service
 #### <img width="941" height="583" alt="image" src="https://github.com/user-attachments/assets/71eb8949-201d-4c28-a6db-4c18e1ebb5ba" />
 ### <br/><br/>
 
+
+## mycluster-router 비밀번호 오류
+### 이 경우 설치 설정 구성 중에 메타데이터가 깨졌을 때 발생하는데,  router의 계정이 없거나 password가 일치하지 않는다고 나온다.
+```
+$ kubectl logs pod/mycluster-router-7d889fdc79-q8tkz -n tgf
+[Entrypoint] MYSQL_CREATE_ROUTER_USER is 0, Router will reuse mysqlrouter-HaNPixH6lS account at runtime
+[Entrypoint] Succesfully contacted mysql server at mycluster-instances.tgf.svc.cluster.local:3306. Checking for cluster state.
+[Entrypoint] Succesfully contacted mysql server at mycluster-instances.tgf.svc.cluster.local. Trying to bootstrap reusing account "mysqlrouter-HaNPixH6lS".
+Please enter MySQL password for mysqlrouter-HaNPixH6lS:
+Error: No result returned for v2_this_instance metadata query
+```
+### <br/>
+
+### 클러스터 노드들이 정상인지 확인한다.
+```
+kubectl exec -it -n tgf mycluster-0 -c mysql -- mysql -uroot -p -e "SELECT MEMBER_ID,MEMBER_HOST,MEMBER_PORT,MEMBER_STATE,MEMBER_ROLE,MEMBER_VERSION FROM performance_schema.replication_group_members;"
+
+# 또는 kubectl로 cluster node 들이 running 중인지 확인
+kubectl get all -n tgf
+```
+#### <img width="948" height="233" alt="image" src="https://github.com/user-attachments/assets/61713239-d5d2-456a-9367-181d698ed066" />
+### <br/>
+
+### 등록된 secret 확인
+#### 여기서 mycluster-cluster-secret을 사용할 거다.
+```
+kubectl get secret -n tgf | grep -i mycluster
+```
+#### <img width="612" height="100" alt="image" src="https://github.com/user-attachments/assets/5159ec1d-5cbe-42f4-bbce-c6ef82c14224" />
+#### <br/>
+
+### PW 변수 설정
+```
+PW="$(kubectl get secret -n tgf mycluster-cluster-secret -o jsonpath='{.data.rootPassword}' | base64 -d)"
+```
+#### <br/>
+
+### router 계정이 에러로 인해 없을 수도 있으므로 생성하고, 비밀번호 재설정
+```
+# 1) Router 계정 생성
+kubectl exec -it -n tgf mycluster-0 -c mysql -- env LC_ALL=C.UTF-8 mysqlsh root@localhost --password="$PW" --js -e "c=dba.getCluster(); c.setupRouterAccount('mysqlrouter',{password:'mysqlcluster'});"
+
+# 2) K8s 시크릿에 주입(덮어쓰기)
+kubectl -n tgf create secret generic mycluster-router --from-literal=MYSQL_PASSWORD='mysqlcluster' --dry-run=client -o yaml | kubectl apply -f -
+
+# 3) Router 재시작
+kubectl rollout restart deploy/mycluster-router -n tgf
+
+# 4) Router 로그 확인
+kubectl logs -n tgf deploy/mycluster-router --tail=200
+```
+### <br/>
+
+### log 확인
+#### <img width="942" height="71" alt="image" src="https://github.com/user-attachments/assets/58a29ffa-702f-41a5-a8f6-ee9b6c3152c0" />
+#### <img width="945" height="198" alt="image" src="https://github.com/user-attachments/assets/81a33cbb-52c6-42bd-8ce2-ae220cac1e19" />
+### <br/><br/>
+
