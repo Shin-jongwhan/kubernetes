@@ -20,6 +20,6 @@ unset MYSQL_PWD
 ### <br/>
 
 ### 그리고나서 가장 쉬운 방법은 GUI 프로그램을 이용하는 방법이다.
-#### 워크플로우를 만드려면 좀 더 연구를 해봐야 한다. 그렇지만 굳이 그렇게까지 할 필요는 없을 듯 하다.
+#### 자동 복구 워크플로우를 만드려면 좀 더 연구를 해봐야 한다. 그렇지만 굳이 그렇게까지 할 필요는 없을 듯 하다.
 ### 아래 링크 참고
 - https://github.com/Shin-jongwhan/mysql_and_sql/tree/main/mysql/how_to_dump#heidisql-%EC%9D%84-%EC%9D%B4%EC%9A%A9%ED%95%98%EB%8A%94-%EB%B0%A9%EB%B2%95%EA%B0%80%EC%9E%A5-%EA%B0%84%ED%8E%B8%ED%95%A8
