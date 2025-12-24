@@ -23,3 +23,36 @@ unset MYSQL_PWD
 #### 자동 복구 워크플로우를 만드려면 좀 더 연구를 해봐야 한다. 그렇지만 굳이 그렇게까지 할 필요는 없을 듯 하다.
 ### 아래 링크 참고
 - https://github.com/Shin-jongwhan/mysql_and_sql/tree/main/mysql/how_to_dump#heidisql-%EC%9D%84-%EC%9D%B4%EC%9A%A9%ED%95%98%EB%8A%94-%EB%B0%A9%EB%B2%95%EA%B0%80%EC%9E%A5-%EA%B0%84%ED%8E%B8%ED%95%A8
+### <br/><br/><br/>
+
+-----------------------------------------
+
+# Troubleshooting
+## DB 복구 후 router 작동이 안 되어 외부에서 접근이 metadata 문제로 갑자기 끊길 떄
+### 상황
+- **Router 로그에서 metadata_cache 경고 확인:**
+  - v2_this_instance metadata query 결과가 없거나
+  - mysql_innodb_cluster_metadata 스키마가 없다고 나옴(1049)
+- **인스턴스 쪽에서 확인:**
+  - mysql_innodb_cluster_metadata.v2_this_instance 가 0 row
+  - mysql_innodb_cluster_metadata.instances에 old UUID만 있거나(혹은 스키마 자체가 없음)
+  - 각 인스턴스의 @@server_uuid와 metadata의 mysql_server_uuid가 불일치
+### 결론: Router가 의존하는 InnoDB Cluster 메타데이터가 깨졌거나(덮임/UUID 불일치) 또는 삭제되어 Router가 Primary를 판단 못함 → 30161(RW) 라우팅 불가
+### 아래 스크립트에 정리하였다.
+#### https://github.com/Shin-jongwhan/kubernetes/blob/main/installation/mysql_innodb_cluster/how_to_backup_and_restore/fix_router_after_restore.sh
+### <br/>
+
+### 사용 방법
+```
+점검만
+bash fix_router_after_restore.sh -n tgf -c mycluster -p 'root_password'
+
+메타데이터 DROP까지
+bash fix_router_after_restore.sh -n tgf -c mycluster -p 'root_password' --drop-metadata
+
+Router 재시작까지
+bash fix_router_after_restore.sh -n tgf -c mycluster -p 'root_password' --restart-router
+
+인스턴스 인덱스가 0 1 2가 아닐 때
+bash fix_router_after_restore.sh -n tgf -c mycluster -p 'root_password' --idxs "0 1 2 3"
+```
