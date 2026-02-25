@@ -36,51 +36,49 @@ watch -n 1 "
 ### <br/>
 
 ```
-# qcstorage01의 sda 장치 종합 I/O 모니터링
-# Throughput (처리량)	IOPS (초당 작업수)	Latency (응답시간)
-sTarget="qcstorage01.ptbio.kr:9100"
-sDev="sda"
+# --- [보안 설정] 변수화 ---
+sTARGET_HOST="your-storage-host.com:9100" # 스토리지 서버 주소
+sDEV_NAME="sda"                           # 모니터링할 디스크 장치명
 
 watch -n 1 "
   # 1. 원본 데이터 수집
-  sMetrics=\$(curl -s http://$sTarget/metrics)
+  sRaw=\$(curl -s http://$sTARGET_HOST/metrics)
   
-  # 2. 각 지표별 데이터 추출 (읽기/쓰기 합산)
-  nReadBytes=\$(echo \"\$sMetrics\" | grep \"node_disk_read_bytes_total{device=\\\"$sDev\\\"}\" | awk '{printf \"%.0f\", \$2}')
-  nWriteBytes=\$(echo \"\$sMetrics\" | grep \"node_disk_written_bytes_total{device=\\\"$sDev\\\"}\" | awk '{printf \"%.0f\", \$2}')
-  
-  nReadOps=\$(echo \"\$sMetrics\" | grep \"node_disk_reads_completed_total{device=\\\"$sDev\\\"}\" | awk '{printf \"%.0f\", \$2}')
-  nWriteOps=\$(echo \"\$sMetrics\" | grep \"node_disk_writes_completed_total{device=\\\"$sDev\\\"}\" | awk '{printf \"%.0f\", \$2}')
-  
-  nReadTime=\$(echo \"\$sMetrics\" | grep \"node_disk_read_time_seconds_total{device=\\\"$sDev\\\"}\" | awk '{print \$2}')
-  nWriteTime=\$(echo \"\$sMetrics\" | grep \"node_disk_write_time_seconds_total{device=\\\"$sDev\\\"}\" | awk '{print \$2}')
+  # 2. 데이터 추출 (지수 표기법 방지를 위해 awk에서 정수로 강제 변환)
+  nRB=\$(echo \"\$sRaw\" | grep \"node_disk_read_bytes_total{device=\\\"$sDEV_NAME\\\"}\" | awk '{printf \"%.0f\", \$2}')
+  nWB=\$(echo \"\$sRaw\" | grep \"node_disk_written_bytes_total{device=\\\"$sDEV_NAME\\\"}\" | awk '{printf \"%.0f\", \$2}')
+  nRO=\$(echo \"\$sRaw\" | grep \"node_disk_reads_completed_total{device=\\\"$sDEV_NAME\\\"}\" | awk '{printf \"%.0f\", \$2}')
+  nWO=\$(echo \"\$sRaw\" | grep \"node_disk_writes_completed_total{device=\\\"$sDEV_NAME\\\"}\" | awk '{printf \"%.0f\", \$2}')
+  nRT=\$(echo \"\$sRaw\" | grep \"node_disk_read_time_seconds_total{device=\\\"$sDEV_NAME\\\"}\" | awk '{printf \"%.3f\", \$2}')
+  nWT=\$(echo \"\$sRaw\" | grep \"node_disk_write_time_seconds_total{device=\\\"$sDEV_NAME\\\"}\" | awk '{printf \"%.3f\", \$2}')
 
-  # 3. 이전 데이터와 비교 및 계산
-  if [ -f /tmp/io_full_state ]; then
-    read pRB pWB pRO pWO pRT pWT < /tmp/io_full_state
+  # 3. 이전 값과 비교 연산
+  if [ -f /tmp/io_state_final ]; then
+    read pRB pWB pRO pWO pRT pWT < /tmp/io_state_final
     
-    # 처리량 (Throughput - MB/s)
-    fThruR=\$(echo \"(\$nReadBytes - \$pRB) / 1024 / 1024\" | bc -l)
-    fThruW=\$(echo \"(\$nWriteBytes - \$pWB) / 1024 / 1024\" | bc -l)
+    # Throughput (MB/s)
+    fTR=\$(echo \"scale=2; (\$nRB - \$pRB) / 1024 / 1024\" | bc -l)
+    fTW=\$(echo \"scale=2; (\$nWB - \$pWB) / 1024 / 1024\" | bc -l)
     
-    # IOPS (Ops/s)
-    nIopsR=\$(echo \"\$nReadOps - \$pRO\" | bc)
-    nIopsW=\$(echo \"\$nWriteOps - \$pWO\" | bc)
+    # IOPS (ops/s)
+    nIR=\$(echo \"\$nRO - \$pRO\" | bc)
+    nIW=\$(echo \"\$nWO - \$pWO\" | bc)
     
-    # 지연 시간 (Latency - ms) : (시간 변화량 / 작업수 변화량) * 1000
-    if [ \$nIopsR -gt 0 ]; then fLatR=\$(echo \"(\$nReadTime - \$pRT) / \$nIopsR * 1000\" | bc -l); else fLatR=0; fi
-    if [ \$nIopsW -gt 0 ]; then fLatW=\$(echo \"(\$nWriteTime - \$pWT) / \$nIopsW * 1000\" | bc -l); else fLatW=0; fi
+    # Latency (ms) - 분모가 0인 경우 처리
+    if [ \$nIR -gt 0 ]; then fLR=\$(echo \"scale=2; (\$nRT - \$pRT) / \$nIR * 1000\" | bc -l); else fLR=0; fi
+    if [ \$nIW -gt 0 ]; then fLW=\$(echo \"scale=2; (\$nWT - \$pWT) / \$nIW * 1000\" | bc -l); else fLW=0; fi
 
-    echo \"--- Storage Comprehensive I/O ($sDev) ---\"
-    printf \"%-12s | %-15s | %-12s | %-12s\n\" \"TYPE\" \"Throughput\" \"IOPS\" \"Latency\"
-    printf \"%-12s | %10.2f MB/s | %8d ops | %8.2f ms\n\" \"READ\" \"\$fThruR\" \"\$nIopsR\" \"\$fLatR\"
-    printf \"%-12s | %10.2f MB/s | %8d ops | %8.2f ms\n\" \"WRITE\" \"\$fThruW\" \"\$nIopsW\" \"\$fLatW\"
+    # 결과 출력
+    echo \"--- Storage Comprehensive I/O Status ($sDEV_NAME) ---\"
+    printf \"%-10s | %-15s | %-12s | %-10s\n\" \"TYPE\" \"Throughput\" \"IOPS\" \"Latency\"
+    printf \"%-10s | %10.2f MB/s | %8d ops | %8.2f ms\n\" \"READ\" \"\$fTR\" \"\$nIR\" \"\$fLR\"
+    printf \"%-10s | %10.2f MB/s | %8d ops | %8.2f ms\n\" \"WRITE\" \"\$fTW\" \"\$nIW\" \"\$fLW\"
   else
-    echo \"데이터를 수집 중입니다... (1초 대기)\"
+    echo \"데이터 수집 중... (1초 뒤 결과가 출력됩니다)\"
   fi
   
-  # 4. 현재 상태 저장
-  echo \"\$nReadBytes \$nWriteBytes \$nReadOps \$nWriteOps \$nReadTime \$nWriteTime\" > /tmp/io_full_state
+  # 현재 값을 다음 계산을 위해 저장
+  echo \"\$nRB \$nWB \$nRO \$nWO \$nRT \$nWT\" > /tmp/io_state_final
 "
 
 ```
