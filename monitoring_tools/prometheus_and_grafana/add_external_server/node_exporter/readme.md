@@ -82,3 +82,14 @@ watch -n 1 "
 "
 
 ```
+#### <br/>
+
+### 위 쿼리를 실행하면 이렇게 나오는데, latency가 부하 측정에 도움이 많이 된다.
+#### 아래는 한 20개 파일 정도를 병렬로 읽었을 때의 상황이다.
+#### 간간히 20.00 ms 아래로는 나오는데, 50 ms는 잘 안 넘는다. 그러므로 50 ms 정도가 넘으면 부하가 있다고 판단할 수 있는 기준이 될 수 있다. 
+```
+--- Storage Comprehensive I/O Status (sda) ---
+TYPE       | Throughput      | IOPS         | Latency
+READ       |     439.37 MB/s |     3646 ops |     0.00 ms
+WRITE      |       0.00 MB/s |        0 ops |     0.00 ms
+```
