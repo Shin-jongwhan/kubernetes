@@ -36,7 +36,7 @@ watch -n 1 "
 ### <br/>
 
 ```
-# --- [보안 설정] 변수화 ---
+# --- 변수 ---
 sTARGET_HOST="your-storage-host.com:9100" # 스토리지 서버 주소
 sDEV_NAME="sda"                           # 모니터링할 디스크 장치명
 
